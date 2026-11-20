@@ -1,0 +1,19 @@
+// Firma de release: lee keystore.properties (local) o variables de entorno (CI).
+def props = new Properties()
+def pf = rootProject.file('../keystore.properties')
+if (pf.exists()) props.load(new FileInputStream(pf))
+def val = { k -> props.getProperty(k) ?: System.getenv(k) }
+
+if (val('KEYSTORE_FILE')) {
+  android {
+    signingConfigs {
+      release {
+        storeFile file(val('KEYSTORE_FILE').startsWith('/') ? val('KEYSTORE_FILE') : "../../${val('KEYSTORE_FILE')}")
+        storePassword val('KEYSTORE_PASSWORD')
+        keyAlias val('KEY_ALIAS')
+        keyPassword val('KEY_PASSWORD')
+      }
+    }
+    buildTypes { release { signingConfig signingConfigs.release } }
+  }
+}

@@ -1,0 +1,16 @@
+:root {
+  --blim-bg: #0a0b10;
+  --blim-surface: #151722;
+  --blim-surface-2: #1d2030;
+  --blim-text: #f2f3f7;
+  --blim-muted: #8b90a3;
+  --blim-accent: #ff6a1a;
+  --ion-background-color: var(--blim-bg);
+  --ion-text-color: var(--blim-text);
+  --ion-font-family: 'Montserrat', 'Roboto', 'Segoe UI', sans-serif;
+  --ion-color-primary: var(--blim-accent);
+  --ion-toolbar-background: var(--blim-bg);
+  --ion-tab-bar-background: #0d0e15;
+  --ion-tab-bar-color: var(--blim-muted);
+  --ion-tab-bar-color-selected: var(--blim-accent);
+}
