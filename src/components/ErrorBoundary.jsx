@@ -14,6 +14,7 @@ export default class ErrorBoundary extends Component {
       <main className="welcome">
         <h1>Algo salió mal</h1>
         <p>No se pudo mostrar esta sección.</p>
+        <p><small>{String(this.state.error)}</small></p>
         <p><a className="btn primary" href="#/">Volver al inicio</a></p>
       </main>
     )

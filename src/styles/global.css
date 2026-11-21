@@ -279,3 +279,17 @@ body{background:radial-gradient(70vw 50vh at 90% 0%,rgba(255,46,99,.13),transpar
 @media(hover:hover) and (pointer:fine){
   .hero-bg{animation:kenburns 14s ease-out both,fade .9s var(--ease)}
 }
+
+/* ===== Modo seguro: sin animaciones, vidrio ni barras flotantes ===== */
+html.safe *,html.safe *::before,html.safe *::after{animation:none!important;transition:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;will-change:auto!important;filter:none!important;scroll-behavior:auto!important}
+html.safe body{background:#0b0b10}
+html.safe .splash{display:none}
+html.safe .nav{position:static;margin:0;border-radius:0;background:#14141c;box-shadow:none}
+html.safe .bottombar{position:sticky;bottom:0;left:auto;right:auto;margin:0;width:100%;border-radius:0;transform:none;background:#14141c;box-shadow:none}
+html.safe .toast{position:fixed;transform:none;background:#222}
+html.safe .page{padding-top:24px}
+html.safe .detail{padding-top:30px}
+html.safe .rows.flat{padding-top:20px}
+html.safe .hero{min-height:60vh}
+html.safe .welcome{min-height:60vh}
+html.safe .footer{padding-bottom:30px}

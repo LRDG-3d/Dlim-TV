@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
+import { initializeFirestore } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 
 // Configuración de Firebase (no es secreta; la seguridad la dan las reglas de Firestore).
@@ -15,5 +15,6 @@ const firebaseConfig = {
 
 export const configured = !firebaseConfig.apiKey.startsWith('PEGA')
 const app = configured ? initializeApp(firebaseConfig) : null
-export const db = app ? getFirestore(app) : null
+// Auto-detecta long polling: evita que Firestore se quede colgado en redes o navegadores que bloquean WebChannel.
+export const db = app ? initializeFirestore(app, { experimentalAutoDetectLongPolling: true }) : null
 export const auth = app ? getAuth(app) : null

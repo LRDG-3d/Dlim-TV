@@ -73,8 +73,16 @@ function Panel() {
       cast: String(f.cast).split(',').map((x) => x.trim()).filter(Boolean), cover: f.cover || '', featured: f.featured, popular: f.popular,
       seasons: f.seasons.map((s) => ({ number: +s.number, zip: s.zip.trim() })), updatedAt: serverTimestamp(),
     }
-    try { setBusy(true); await setDoc(doc(db, 'titles', id), data); setMsg('✓ Guardado'); setF(empty) }
-    catch (x) { setErr(x.code === 'permission-denied' ? 'Sin permiso: revisa las reglas de Firestore y tu UID.' : x.message) }
+    try {
+      setBusy(true)
+      const espera = new Promise((_, no) => setTimeout(() => no(new Error('timeout')), 15000))
+      await Promise.race([setDoc(doc(db, 'titles', id), data), espera])
+      setMsg('✓ Guardado'); setF(empty)
+    } catch (x) {
+      if (x.code === 'permission-denied') setErr('Sin permiso: revisa las reglas de Firestore y que el UID sea el tuyo.')
+      else if (x.message === 'timeout' || x.code === 'unavailable') setErr('Firestore no responde. Revisa que la base de datos esté creada en Firebase (Build → Firestore Database), que no la bloquee un bloqueador de anuncios y tu conexión.')
+      else setErr(`${x.code || 'Error'}: ${x.message}`)
+    }
     finally { setBusy(false) }
   }
   const edit = (t) => { setF({ ...empty, ...t, cast: t.cast.join(', '), seasons: Array.isArray(t.seasons) ? t.seasons : [] }); window.scrollTo({ top: 0, behavior: 'smooth' }) }
