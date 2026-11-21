@@ -27,7 +27,7 @@ export default function Detail() {
           </dl>
           {Array.isArray(it.seasons) && it.seasons.length > 0 && (
             <div className="seasons">{it.seasons.map((s) => (
-              <a key={s.number} className="btn" href={s.zip} target="_blank" rel="noopener noreferrer">Temporada {s.number} (ZIP)</a>
+              <a key={s.number} className="btn" href={s.zip} target="_blank" rel="noopener noreferrer">Temporada {s.number}</a>
             ))}</div>
           )}
           <button className={has(it.id) ? 'btn on' : 'btn primary'} onClick={() => toggle(it.id)}>

@@ -7,8 +7,8 @@ import { years, genres } from '../data/titles.js'
 
 const empty = { id: '', title: '', type: 'Telenovela', year: 2004, episodes: '', genres: [], synopsis: '', cast: '', cover: '', featured: false, popular: false, seasons: [] }
 const slug = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-// Solo se aceptan enlaces http(s) cuyo archivo termine en .zip
-const isZip = (u) => { try { const x = new URL(u); return x.protocol.startsWith('http') && x.pathname.toLowerCase().endsWith('.zip') } catch { return false } }
+// Un solo enlace por temporada: la carpeta donde están los episodios en ZIP (cualquier URL http o https válida)
+const isUrl = (u) => { try { return new URL(u).protocol.startsWith('http') } catch { return false } }
 
 // Reduce la portada a 500 px y la guarda como JPG en texto (así no hace falta Firebase Storage).
 function resize(file) {
@@ -69,8 +69,8 @@ function Panel() {
     if (!f.title.trim()) return setErr('Escribe el nombre.')
     if (!(y >= 2000 && y <= 2014)) return setErr('El año debe estar entre 2000 y 2014.')
     if (!f.genres.length) return setErr('Elige al menos un género.')
-    const bad = f.seasons.find((s) => !isZip(s.zip))
-    if (bad) return setErr(`La temporada ${bad.number} necesita una URL que termine en .zip`)
+    const bad = f.seasons.find((s) => !isUrl(s.zip))
+    if (bad) return setErr(`La temporada ${bad.number} necesita una URL válida que empiece con http:// o https://`)
     const id = f.id || `${slug(f.title)}-${y}`
     const data = {
       title: f.title.trim(), type: f.type, year: y, episodes: +f.episodes || 0, genres: f.genres, synopsis: f.synopsis.trim(),
@@ -119,12 +119,12 @@ function Panel() {
           {f.seasons.map((s, i) => (
             <div className="season-row" key={i}>
               <input type="number" min="1" value={s.number} onChange={(e) => setSeason(i, 'number', e.target.value)} aria-label="Número de temporada" />
-              <input type="url" placeholder="https://…/temporada1.zip" value={s.zip} onChange={(e) => setSeason(i, 'zip', e.target.value)} className={s.zip && !isZip(s.zip) ? 'bad' : ''} />
+              <input type="url" placeholder="https://…/carpeta-de-la-temporada" value={s.zip} onChange={(e) => setSeason(i, 'zip', e.target.value)} className={s.zip && !isUrl(s.zip) ? 'bad' : ''} />
               <button type="button" className="btn" onClick={() => set('seasons', f.seasons.filter((_, n) => n !== i))} aria-label="Quitar">✕</button>
             </div>
           ))}
           <button type="button" className="btn" onClick={() => set('seasons', [...f.seasons, { number: f.seasons.length + 1, zip: '' }])}>+ Añadir temporada</button>
-          <small>Un solo enlace por temporada, directo a un archivo .zip con todos los episodios.</small>
+          <small>Un solo enlace por temporada: la carpeta donde están guardados los episodios en ZIP.</small>
         </fieldset>
         {err && <p className="aerr">{err}</p>}{msg && <p className="aok">{msg}</p>}
         <div className="arow"><button className="btn primary" disabled={busy}>{busy ? 'Guardando…' : 'Guardar'}</button>
