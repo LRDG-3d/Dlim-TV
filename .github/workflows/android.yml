@@ -3,10 +3,11 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Versión (ejemplo: v1.0.0)'
-        required: true
-        default: 'v1.0.0'
+        description: 'Versión (ejemplo: v1.0.0). Déjalo vacío para usar "latest"'
+        required: false
+        default: ''
   push:
+    branches: [main]
     tags: ['v*']
 
 permissions:
@@ -27,15 +28,22 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npx cap add android
-      - name: Generar iconos (si hay assets/icon-only.png)
-        if: hashFiles('assets/icon-only.png') != ''
-        run: npx capacitor-assets generate --android
       - run: npx cap sync android
       - name: Compilar APK
         working-directory: android
         run: ./gradlew assembleDebug
       - name: Renombrar APK
         run: cp android/app/build/outputs/apk/debug/app-debug.apk Dlim-TV.apk
+      - name: Definir versión
+        id: v
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "tag=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: Dlim-TV-apk
@@ -43,6 +51,6 @@ jobs:
       - name: Publicar en Releases
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.version || github.ref_name }}
-          name: Dlim TV ${{ github.event.inputs.version || github.ref_name }}
+          tag_name: ${{ steps.v.outputs.tag }}
+          name: Dlim TV ${{ steps.v.outputs.tag }}
           files: Dlim-TV.apk
