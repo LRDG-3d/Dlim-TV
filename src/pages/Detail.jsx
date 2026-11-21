@@ -1,38 +1,68 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { listZips, epLabel, mb } from '../lib/zips.js'
-import Poster from '../components/Poster.jsx'
-import Row from '../components/Row.jsx'
+import { listZips, epLabel, epNum, epCode, mb, fmtDate } from '../lib/zips.js'
 import { useTitles } from '../hooks/useTitles.jsx'
 import { useFavorites } from '../hooks/useFavorites.jsx'
 
-function Season({ s }) {
-  const [open, setOpen] = useState(false)
-  const [st, setSt] = useState({ loading: false, list: null, err: '' })
-  async function toggle() {
-    const o = !open; setOpen(o)
-    if (o && !st.list && !st.loading) {
-      setSt({ loading: true, list: null, err: '' })
-      try { setSt({ loading: false, list: await listZips(s.zip), err: '' }) }
-      catch { setSt({ loading: false, list: null, err: 'No se pudo leer la carpeta desde aquí.' }) }
-    }
-  }
+const hueOf = (id) => [...id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 0)
+const pad = (n) => String(n).padStart(2, '0')
+const PLAY = 'M7 4l13 8-13 8z'
+const HEART = 'M12 21s-7-4.6-9.3-9A5.3 5.3 0 0112 6.6 5.3 5.3 0 0121.3 12C19 16.4 12 21 12 21z'
+const SHARE = 'M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v13'
+const Icon = ({ d, fill }) => (
+  <svg width="26" height="26" viewBox="0 0 24 24" fill={fill || 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
+)
+
+function Cover({ it }) {
+  const [bad, setBad] = useState(false)
+  const src = it.cover || (it.image && `${import.meta.env.BASE_URL}images/${it.image}`)
+  if (src && !bad) return <img className="dv-img" src={src} alt={it.title} onError={() => setBad(true)} />
+  const h = hueOf(it.id)
   return (
-    <div className="season">
-      <button className="btn" onClick={toggle} aria-expanded={open}>
-        Temporada {s.number}{s.count ? ` · ${s.count} episodios` : ''} {open ? '▴' : '▾'}
+    <div className="dv-img dv-gen" style={{ background: `linear-gradient(160deg, hsl(${h} 70% 38%), hsl(${(h + 50) % 360} 60% 10%) 80%)` }}>
+      <span>{it.title}</span>
+    </div>
+  )
+}
+
+function Season({ s, desc, refresh, defaultOpen }) {
+  const [open, setOpen] = useState(defaultOpen)
+  const [st, setSt] = useState({ loading: false, list: null, err: '' })
+  useEffect(() => {
+    if (!open) return undefined
+    let live = true
+    setSt((p) => ({ ...p, loading: true, err: '' }))
+    listZips(s.zip)
+      .then((list) => { if (live) setSt({ loading: false, list, err: '' }) })
+      .catch(() => { if (live) setSt({ loading: false, list: null, err: 'No se pudo leer la carpeta desde aquí.' }) })
+    return () => { live = false }
+  }, [open, s.zip, refresh])
+  const list = st.list ? (desc ? [...st.list].reverse() : st.list) : null
+  const total = st.list ? st.list.length : s.count
+  return (
+    <div className="dv-season">
+      <button className={open ? 'dv-sh2 open' : 'dv-sh2'} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <span className="dv-folder"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z" /></svg></span>
+        <span className="dv-st">Temporada {pad(s.number)}{total ? <small>{total} episodios</small> : null}</span>
+        <span className="dv-chev">⌃</span>
       </button>
       {open && (
-        <div className="eps">
-          {st.loading && <p>Buscando episodios…</p>}
-          {st.err && <p>{st.err}</p>}
-          {st.list && !st.list.length && <p>No se detectaron archivos ZIP en la carpeta.</p>}
-          {st.list && st.list.map((e) => (
-            <a key={e.url} className="ep" href={e.url} target="_blank" rel="noopener noreferrer">
-              <span>{epLabel(e.name)}</span><small>{mb(e.size)}</small><b>Descargar ZIP</b>
+        <div className="dv-eps">
+          {st.loading && <p className="dv-note">Buscando episodios…</p>}
+          {st.err && <p className="dv-note">{st.err}</p>}
+          {list && !list.length && <p className="dv-note">No se detectaron archivos ZIP en la carpeta.</p>}
+          {list && list.map((e, i) => (
+            <a key={e.url} className="dv-ep" href={e.url} target="_blank" rel="noopener noreferrer">
+              <span className="dv-epn">{epNum(e.name) ?? i + 1}</span>
+              <span className="dv-ept">
+                <small>{epCode(e.name)}</small>
+                <b>{epLabel(e.name)}</b>
+                <em>{[fmtDate(e.date), mb(e.size)].filter(Boolean).join(' · ')}</em>
+              </span>
+              <i>›</i>
             </a>
           ))}
-          <a className="folder" href={s.zip} target="_blank" rel="noopener noreferrer">Abrir carpeta ↗</a>
+          <a className="dv-folderlink" href={s.zip} target="_blank" rel="noopener noreferrer">Abrir carpeta ↗</a>
         </div>
       )}
     </div>
@@ -43,32 +73,81 @@ export default function Detail() {
   const { id } = useParams()
   const { titles } = useTitles()
   const { has, toggle } = useFavorites()
+  const [tab, setTab] = useState('resumen')
+  const [desc, setDesc] = useState(false)
+  const [refresh, setRefresh] = useState(0)
+  const [msg, setMsg] = useState('')
   const it = titles.find((x) => x.id === id)
   if (!it) return <main className="page"><p className="empty">No encontramos esa producción. <Link to="/catalogo">Ir al catálogo</Link></p></main>
-  const similar = titles.filter((x) => x.id !== it.id && x.genres.some((g) => it.genres.includes(g)))
-  const seasonCount = Array.isArray(it.seasons) ? it.seasons.length : it.seasons || 0
+
+  const seasons = Array.isArray(it.seasons) ? it.seasons : []
+  const seasonCount = seasons.length || (typeof it.seasons === 'number' ? it.seasons : 0)
+  const fav = has(it.id)
+  async function share() {
+    const data = { title: it.title, text: `${it.title} en Dlim TV`, url: window.location.href }
+    try {
+      if (navigator.share) await navigator.share(data)
+      else { await navigator.clipboard.writeText(window.location.href); setMsg('Enlace copiado'); setTimeout(() => setMsg(''), 1800) }
+    } catch { /* cancelado */ }
+  }
+
   return (
-    <main>
-      <section className="detail">
-        <Poster item={it} />
-        <div className="detail-body">
-          <h1>{it.title}</h1>
-          <p className="detail-meta">{it.year} · {it.type} · {it.genres.join(', ')}</p>
-          <p className="detail-syn">{it.synopsis}</p>
-          <dl>
-            <dt>Episodios</dt><dd>{it.episodes}</dd>
-            {seasonCount > 0 && <><dt>Temporadas</dt><dd>{seasonCount}</dd></>}
-            {it.cast.length > 0 && <><dt>Reparto</dt><dd>{it.cast.join(', ')}</dd></>}
-          </dl>
-          {Array.isArray(it.seasons) && it.seasons.length > 0 && (
-            <div className="seasons">{it.seasons.map((s) => <Season key={s.number} s={s} />)}</div>
+    <main className="dv">
+      <div className="dv-tabs" role="tablist">
+        <button role="tab" aria-selected={tab === 'resumen'} className={tab === 'resumen' ? 'on' : ''} onClick={() => setTab('resumen')}>Resumen</button>
+        <button role="tab" aria-selected={tab === 'temporadas'} className={tab === 'temporadas' ? 'on' : ''} onClick={() => setTab('temporadas')}>Temporadas</button>
+      </div>
+
+      {tab === 'resumen' ? (
+        <div className="dv-view">
+          <div className="dv-cover">
+            <Cover it={it} />
+            <div className="dv-actions">
+              <button onClick={() => setTab('temporadas')} aria-label="Ver temporadas"><Icon d={PLAY} fill="currentColor" /></button>
+              <button className={fav ? 'fav-on' : ''} onClick={() => toggle(it.id)} aria-pressed={fav} aria-label="Favoritos"><Icon d={HEART} fill={fav ? 'currentColor' : 'none'} /></button>
+              <button onClick={share} aria-label="Compartir"><Icon d={SHARE} /></button>
+            </div>
+            {msg && <span className="dv-msg">{msg}</span>}
+          </div>
+          <section className="dv-sheet up">
+            <h1>{it.title}</h1>
+            <div className="dv-chips">
+              <span className="first">{it.type}</span>
+              <span>{it.year}</span>
+              {seasonCount > 0 && <span>{seasonCount} {seasonCount === 1 ? 'temporada' : 'temporadas'}</span>}
+              {it.episodes > 0 && <span>{it.episodes} episodios</span>}
+              {it.genres.map((g) => <span key={g}>{g}</span>)}
+            </div>
+            {it.synopsis && <p className="dv-syn">{it.synopsis}</p>}
+          </section>
+          {it.cast.length > 0 && (
+            <section className="dv-sheet">
+              <h2>Reparto</h2>
+              <div className="dv-cast">
+                {it.cast.map((n) => (
+                  <div className="dv-person" key={n}>
+                    <span>{n.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase()}</span>
+                    <b>{n}</b>
+                  </div>
+                ))}
+              </div>
+            </section>
           )}
-          <button className={has(it.id) ? 'btn on' : 'btn primary'} onClick={() => toggle(it.id)}>
-            {has(it.id) ? '✓ En mi lista (quitar)' : '+ Agregar a favoritos'}
-          </button>
         </div>
-      </section>
-      <div className="similar"><Row title="Más como esto" items={similar} /></div>
+      ) : (
+        <div className="dv-view dv-seasons">
+          <div className="dv-top">
+            <h2>{it.title}</h2>
+            <div>
+              <button className="dv-pill" onClick={() => setDesc((d) => !d)}>⇅ {desc ? 'Descendente' : 'Ascendente'}</button>
+              <button className="dv-pill sq" onClick={() => setRefresh((r) => r + 1)} aria-label="Actualizar">↻</button>
+            </div>
+          </div>
+          {seasons.length
+            ? seasons.map((s, i) => <Season key={s.number} s={s} desc={desc} refresh={refresh} defaultOpen={i === 0} />)
+            : <p className="dv-note">Aún no hay temporadas agregadas.</p>}
+        </div>
+      )}
     </main>
   )
 }

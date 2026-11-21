@@ -26,7 +26,7 @@ export async function listZips(url) {
     const j = await r.json()
     return (j.files || [])
       .filter((f) => /\.zip$/i.test(f.name))
-      .map((f) => ({ name: f.name, size: +f.size || 0, url: `https://archive.org/download/${encodeURIComponent(id)}/${enc(f.name)}` }))
+      .map((f) => ({ name: f.name, size: +f.size || 0, date: f.mtime ? +f.mtime * 1000 : 0, url: `https://archive.org/download/${encodeURIComponent(id)}/${enc(f.name)}` }))
       .sort(natural)
   }
   // Otras carpetas: lee el listado HTML, busca .zip y entra a las subcarpetas (hasta 3 niveles, máx. 40 páginas)
@@ -63,3 +63,6 @@ export const epLabel = (name) => {
   return m ? `Episodio ${+m[2]}` : base.replace(/\.zip$/i, '')
 }
 export const mb = (b) => (b ? `${(b / 1048576).toFixed(0)} MB` : '')
+export const epNum = (name) => { const m = name.split('/').pop().match(/S(\d+)E(\d+)/i); return m ? +m[2] : null }
+export const epCode = (name) => { const m = name.split('/').pop().match(/S\d+E\d+/i); return m ? m[0].toUpperCase() : '' }
+export const fmtDate = (t) => (t ? new Date(t).toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '')
