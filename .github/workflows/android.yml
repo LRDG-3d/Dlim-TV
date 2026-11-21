@@ -15,7 +15,6 @@ jobs:
         with: { node-version: 20, cache: npm }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 17 }
-      - uses: android-actions/setup-android@v3
       - name: Dependencias
         run: npm install   # cambia a "npm ci" cuando subas package-lock.json
       - name: Plataforma Android
