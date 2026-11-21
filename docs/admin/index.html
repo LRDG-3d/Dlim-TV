@@ -19,6 +19,15 @@ button.g{background:var(--s2)}button.d{background:#8a1f3a}
 </style></head><body>
 <h1><span>DLIM TV</span> · Administrador</h1>
 
+<div id="boot" class="msg">Cargando…</div>
+<script>
+const B=()=>document.getElementById("boot");
+const fail=(t)=>{const b=B();if(b){b.textContent=t;b.className="msg err"}};
+window.addEventListener("error",(e)=>{const t=e.target;fail(t&&t.src?"No se pudo cargar "+t.src.split("/").pop()+" (¿está subido a GitHub?)":"Error: "+e.message)},true);
+window.addEventListener("unhandledrejection",(e)=>fail("Error: "+(e.reason&&e.reason.message||e.reason)));
+setTimeout(()=>{if(B()&&B().textContent==="Cargando…")fail("Firebase no respondió. Revisa firebase-config.js y los dominios autorizados.")},6000);
+</script>
+
 <section id="login" class="hide">
   <label>Correo</label><input id="email" type="email" autocomplete="username">
   <label>Contraseña</label><input id="pass" type="password" autocomplete="current-password">

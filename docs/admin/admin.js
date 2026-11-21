@@ -93,6 +93,7 @@ async function load() {
 $('#btnLogin').onclick = () => signInWithEmailAndPassword(auth, $('#email').value, $('#pass').value).catch(() => say('#loginMsg', 'Correo o contraseña incorrectos.', 'err'));
 ['#btnOut1', '#btnOut2'].forEach((b) => { $(b).onclick = () => signOut(auth); });
 onAuthStateChanged(auth, async (u) => {
+  document.querySelector('#boot')?.remove();
   if (!u) return show('login');
   const ok = (await getDoc(doc(db, 'admins', u.uid))).exists();
   if (!ok) { $('#uid').textContent = u.uid; return show('noadmin'); }
