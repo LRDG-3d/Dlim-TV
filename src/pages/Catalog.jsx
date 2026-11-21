@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import Spinner from '../components/Spinner.jsx'
 import Card from '../components/Card.jsx'
 import { useTitles } from '../hooks/useTitles.jsx'
 import { years, genres, types } from '../data/titles.js'
@@ -7,7 +8,7 @@ import { years, genres, types } from '../data/titles.js'
 const norm = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 
 export default function Catalog({ fixedType, heading, autoFocus }) {
-  const { titles } = useTitles()
+  const { titles, loading } = useTitles()
   const [params, setParams] = useSearchParams()
   const q = params.get('q') || ''
   const setQ = (v) => setParams(v ? { q: v } : {}, { replace: true })
@@ -40,7 +41,7 @@ export default function Catalog({ fixedType, heading, autoFocus }) {
           </select>
         )}
       </div>
-      {list.length ? <div className="grid">{list.map((i) => <Card key={i.id} item={i} />)}</div>
+      {loading && !titles.length ? <Spinner label="Cargando catálogo…" /> : list.length ? <div className="grid">{list.map((i) => <Card key={i.id} item={i} />)}</div>
         : <p className="empty">Sin resultados. Prueba con otro filtro o búsqueda.</p>}
     </main>
   )

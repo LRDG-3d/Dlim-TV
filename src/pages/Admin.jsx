@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import { doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db, configured } from '../firebase.js'
+import Spinner from '../components/Spinner.jsx'
 import { listZips } from '../lib/zips.js'
 import { useTitles } from '../hooks/useTitles.jsx'
 import { years, genres } from '../data/titles.js'
@@ -36,7 +37,7 @@ export default function Admin() {
     <main className="page admin"><h1 className="page-title">Panel de administración</h1>
       <p className="empty">Firebase aún no está configurado. Pega tu configuración en <code>src/firebase.js</code> (mira el tutorial).</p></main>
   )
-  if (user === undefined) return <main className="page"><p className="empty">Cargando…</p></main>
+  if (user === undefined) return <main className="page"><Spinner label="Cargando…" /></main>
   return user ? <Panel /> : <Login />
 }
 
@@ -141,7 +142,7 @@ function Panel() {
           <small>Un solo enlace por temporada: la carpeta donde están guardados los episodios en ZIP. La página detecta los archivos .zip sola.</small>
         </fieldset>
         {err && <p className="aerr">{err}</p>}{msg && <p className="aok">{msg}</p>}
-        <div className="arow"><button className="btn primary" disabled={busy}>{busy ? 'Guardando…' : 'Guardar'}</button>
+        <div className="arow"><button className="btn primary" disabled={busy}>{busy ? <><Spinner small /> Guardando…</> : 'Guardar'}</button>
           {f.id && <button type="button" className="btn" onClick={() => setF(empty)}>Cancelar edición</button>}</div>
       </form>
       <h2 className="alist-title">Producciones guardadas ({remote.length})</h2>

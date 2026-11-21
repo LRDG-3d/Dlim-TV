@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { listZips, epLabel, epNum, epCode, mb, fmtDate } from '../lib/zips.js'
+import Spinner from '../components/Spinner.jsx'
 import { useTitles } from '../hooks/useTitles.jsx'
 import { useFavorites } from '../hooks/useFavorites.jsx'
 
@@ -48,7 +49,7 @@ function Season({ s, desc, refresh, defaultOpen }) {
       </button>
       {open && (
         <div className="dv-eps">
-          {st.loading && <p className="dv-note">Buscando episodios…</p>}
+          {st.loading && <p className="dv-note dv-load"><Spinner small /> Buscando episodios…</p>}
           {st.err && <p className="dv-note">{st.err}</p>}
           {list && !list.length && <p className="dv-note">No se detectaron archivos ZIP en la carpeta.</p>}
           {list && list.map((e, i) => (
@@ -71,13 +72,14 @@ function Season({ s, desc, refresh, defaultOpen }) {
 
 export default function Detail() {
   const { id } = useParams()
-  const { titles } = useTitles()
+  const { titles, loading } = useTitles()
   const { has, toggle } = useFavorites()
   const [tab, setTab] = useState('resumen')
   const [desc, setDesc] = useState(false)
   const [refresh, setRefresh] = useState(0)
   const [msg, setMsg] = useState('')
   const it = titles.find((x) => x.id === id)
+  if (!it && loading) return <main className="page"><Spinner label="Cargando…" /></main>
   if (!it) return <main className="page"><p className="empty">No encontramos esa producción. <Link to="/catalogo">Ir al catálogo</Link></p></main>
 
   const seasons = Array.isArray(it.seasons) ? it.seasons : []

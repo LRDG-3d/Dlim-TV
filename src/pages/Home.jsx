@@ -1,11 +1,13 @@
 import Hero from '../components/Hero.jsx'
 import Row from '../components/Row.jsx'
+import Spinner from '../components/Spinner.jsx'
 import { useTitles } from '../hooks/useTitles.jsx'
 
 export default function Home() {
-  const { titles } = useTitles()
+  const { titles, loading } = useTitles()
   const range = (a, b) => titles.filter((x) => x.year >= a && x.year <= b)
   const featured = titles.filter((x) => x.featured)
+  if (!titles.length && loading) return <main className="welcome"><Spinner /></main>
   if (!titles.length) return (
     <main className="welcome">
       <h1>Bienvenido a Dlim TV</h1>

@@ -12,6 +12,7 @@ import BottomBar from './components/BottomBar.jsx'
 
 export default function App() {
   const { pathname } = useLocation()
+  const enFicha = pathname.startsWith('/titulo/')
   const [splash, setSplash] = useState(() => !sessionStorage.getItem('dlim:splash'))
   useEffect(() => {
     if (!splash) return
@@ -40,8 +41,8 @@ export default function App() {
       </Routes>
       </ErrorBoundary>
       </div>
-      <BottomBar />
-      <footer className="footer">Dlim TV · Proyecto de catálogo fan, sin fines de lucro. Las producciones pertenecen a sus titulares.</footer>
+      {!enFicha && <BottomBar />}
+      <footer className={enFicha ? 'footer slim' : 'footer'}>Dlim TV · Proyecto de catálogo fan, sin fines de lucro. Las producciones pertenecen a sus titulares.</footer>
     </>
   )
 }
