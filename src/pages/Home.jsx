@@ -1,26 +1,23 @@
-import { IonContent, IonPage } from '@ionic/react';
-import TopBar from '../components/TopBar';
-import Hero from '../components/Hero';
-import Carousel from '../components/Carousel';
-import { CATEGORIES, inCategory, byId } from '../services/catalogUtils';
-import { useFavorites } from '../services/favorites';
-import { useCatalog } from '../services/catalogStore';
+import Hero from '../components/Hero.jsx'
+import Row from '../components/Row.jsx'
+import { titles } from '../data/titles.js'
+
+const range = (a, b) => titles.filter((x) => x.year >= a && x.year <= b)
 
 export default function Home() {
-  const { ids } = useFavorites();
-  const { items } = useCatalog();
-  const mine = ids.map((id) => byId(items, id)).filter(Boolean);
-  const featured = items.filter((p) => p.featured);
+  const featured = titles.filter((x) => x.featured)
   return (
-    <IonPage>
-      <TopBar />
-      <IonContent fullscreen>
-        {!items.length && <div className="empty">El catálogo está vacío. Publica series desde el panel de administrador.</div>}
-        <Hero items={featured.length ? featured : items.slice(0, 5)} />
-        <Carousel title="Mi lista" items={mine} />
-        {CATEGORIES.map((c) => <Carousel key={c} title={c} items={inCategory(items, c)} />)}
-        <div style={{ height: 24 }} />
-      </IonContent>
-    </IonPage>
-  );
+    <main>
+      <Hero items={featured} />
+      <div className="rows">
+        <Row title="Producciones destacadas" items={featured} />
+        <Row title="Lo más popular" items={titles.filter((x) => x.popular)} />
+        <Row title="Telenovelas" items={titles.filter((x) => x.type === 'Telenovela')} />
+        <Row title="Series" items={titles.filter((x) => x.type === 'Serie')} />
+        <Row title="Del 2000 al 2004" items={range(2000, 2004)} />
+        <Row title="Del 2005 al 2009" items={range(2005, 2009)} />
+        <Row title="Del 2010 al 2014" items={range(2010, 2014)} />
+      </div>
+    </main>
+  )
 }

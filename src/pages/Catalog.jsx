@@ -1,38 +1,42 @@
-import { useMemo, useState } from 'react';
-import { IonContent, IonPage } from '@ionic/react';
-import TopBar from '../components/TopBar';
-import PosterGrid from '../components/PosterGrid';
-import { CATEGORIES, genresOf, yearsOf, filterCatalog } from '../services/catalogUtils';
-import { useCatalog } from '../services/catalogStore';
+import { useState, useEffect, useRef } from 'react'
+import Card from '../components/Card.jsx'
+import { titles, years, genres, types } from '../data/titles.js'
 
-export default function Catalog() {
-  const { items: all } = useCatalog();
-  const [category, setCategory] = useState('');
-  const [year, setYear] = useState('');
-  const [genre, setGenre] = useState('');
-  const items = useMemo(() => filterCatalog(all, { category, year, genre }), [all, category, year, genre]);
+const norm = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+
+export default function Catalog({ fixedType, heading, autoFocus }) {
+  const [q, setQ] = useState('')
+  const [year, setYear] = useState('')
+  const [genre, setGenre] = useState('')
+  const [type, setType] = useState('')
+  const input = useRef(null)
+  useEffect(() => { if (autoFocus) input.current?.focus() }, [autoFocus])
+
+  const activeType = fixedType || type
+  const list = titles
+    .filter((x) => (!activeType || x.type === activeType) && (!year || x.year === +year) && (!genre || x.genres.includes(genre)))
+    .filter((x) => !q || norm(`${x.title} ${x.cast.join(' ')}`).includes(norm(q)))
+    .sort((a, b) => a.year - b.year || a.title.localeCompare(b.title))
+
   return (
-    <IonPage>
-      <TopBar />
-      <IonContent fullscreen>
-        <div className="chips">
-          {['', ...CATEGORIES].map((c) => (
-            <button key={c || 'todo'} className={`chip ${category === c ? 'on' : ''}`} onClick={() => setCategory(c)}>{c || 'Todo'}</button>
-          ))}
-        </div>
-        <div className="selects">
-          <select aria-label="Año" value={year} onChange={(e) => setYear(e.target.value)}>
-            <option value="">Todos los años</option>
-            {yearsOf(all).map((y) => <option key={y} value={y}>{y}</option>)}
+    <main className="page">
+      <h1 className="page-title">{heading}</h1>
+      <div className="filters">
+        <input ref={input} type="search" placeholder="Buscar título o actor" value={q} onChange={(e) => setQ(e.target.value)} />
+        <select value={year} onChange={(e) => setYear(e.target.value)} aria-label="Año">
+          <option value="">Todos los años</option>{years.map((y) => <option key={y}>{y}</option>)}
+        </select>
+        <select value={genre} onChange={(e) => setGenre(e.target.value)} aria-label="Género">
+          <option value="">Todos los géneros</option>{genres.map((g) => <option key={g}>{g}</option>)}
+        </select>
+        {!fixedType && (
+          <select value={type} onChange={(e) => setType(e.target.value)} aria-label="Tipo">
+            <option value="">Todos los tipos</option>{types.map((t) => <option key={t}>{t}</option>)}
           </select>
-          <select aria-label="Género" value={genre} onChange={(e) => setGenre(e.target.value)}>
-            <option value="">Todos los géneros</option>
-            {genresOf(all).map((g) => <option key={g} value={g}>{g}</option>)}
-          </select>
-        </div>
-        <div className="count">{items.length} producciones</div>
-        <PosterGrid items={items} />
-      </IonContent>
-    </IonPage>
-  );
+        )}
+      </div>
+      {list.length ? <div className="grid">{list.map((i) => <Card key={i.id} item={i} />)}</div>
+        : <p className="empty">Sin resultados. Prueba con otro filtro o búsqueda.</p>}
+    </main>
+  )
 }

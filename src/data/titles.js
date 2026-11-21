@@ -1,0 +1,66 @@
+// Para agregar una producción, añade un objeto aquí. No hay que tocar el diseño.
+// image: nombre de archivo dentro de public/images (ej. 'rebelde.jpg'). Si es null se muestra una portada generada.
+// Nota: episodios y reparto son referenciales; verifícalos antes de publicar.
+const t = (id, title, year, type, genres, episodes, synopsis, cast = [], o = {}) => ({
+  id, title, year, type, genres, episodes, synopsis, cast, seasons: o.seasons || null,
+  image: o.image || null, featured: !!o.featured, popular: !!o.popular,
+})
+
+export const titles = [
+  t('rebelde', 'Rebelde', 2004, 'Telenovela', ['Juvenil', 'Drama'], 440,
+    'En el elitista colegio Elite Way School, un grupo de jóvenes forma una banda de pop mientras enfrenta amores, rivalidades y secretos.',
+    ['Anahí', 'Dulce María', 'Alfonso Herrera', 'Christian Chávez', 'Christopher von Uckermann', 'Maite Perroni'], { featured: true, popular: true }),
+  t('rubi', 'Rubí', 2004, 'Telenovela', ['Drama'], 115,
+    'Una joven bella y ambiciosa está dispuesta a todo para salir de la pobreza, sin medir a quién lastima en el camino.',
+    ['Bárbara Mori', 'Eduardo Santamarina', 'Jacqueline Bracamontes'], { featured: true, popular: true }),
+  t('fea', 'La fea más bella', 2006, 'Telenovela', ['Comedia'], 300,
+    'Lety, una secretaria brillante pero poco convencional, conquista el mundo de la moda y el corazón de su jefe.',
+    ['Angélica Vale', 'Jaime Camil'], { popular: true }),
+  t('destilando', 'Destilando amor', 2007, 'Telenovela', ['Drama'], 164,
+    'Una tequilera valiente defiende su hacienda y su dignidad frente a un amor intenso y una familia poderosa.',
+    ['Angélica Rivera', 'Eduardo Yáñez'], { featured: true }),
+  t('pasion', 'Pasión', 2007, 'Telenovela', ['Drama', 'Suspenso'], 170,
+    'Ambientada en el siglo XIX, una historia de amor y venganza entre dos familias rivales.',
+    ['Susana González', 'Fernando Colunga']),
+  t('manana', 'Mañana es para siempre', 2008, 'Telenovela', ['Drama', 'Suspenso'], 175,
+    'Un amor marcado por la tragedia, el engaño y el deseo de justicia.',
+    ['Silvia Navarro', 'Fernando Colunga']),
+  t('teresa', 'Teresa', 2010, 'Telenovela', ['Drama'], 152,
+    'Una joven de origen humilde decide cambiar su destino y escalar socialmente a cualquier precio.',
+    ['Angelique Boyer', 'Aarón Díaz'], { popular: true }),
+  t('soy-tu-duena', 'Soy tu dueña', 2010, 'Telenovela', ['Drama'], 160,
+    'Una mujer decidida administra una hacienda y enfrenta a un hombre que cambiará su vida.',
+    ['Lucero', 'Fernando Colunga']),
+  t('vida-me-robo', 'Lo que la vida me robó', 2013, 'Telenovela', ['Drama', 'Suspenso'], 189,
+    'Una joven es forzada a renunciar a su amor y a su familia en una trama de ambición y secretos.',
+    ['Angelique Boyer', 'Sebastián Rulli'], { popular: true }),
+  t('tempestad', 'La tempestad', 2013, 'Telenovela', ['Drama', 'Suspenso'], 128,
+    'Una mujer busca la verdad tras la muerte de su esposo y se enfrenta a un pasado oculto.',
+    ['William Levy', 'Ana Brenda Contreras']),
+  t('atrevete', 'Atrévete a soñar', 2009, 'Telenovela', ['Juvenil', 'Drama'], 150,
+    'Una joven cantante de gran talento persigue su sueño de ser estrella.',
+    ['Danna Paola']),
+  t('camaleones', 'Camaleones', 2009, 'Telenovela', ['Juvenil', 'Comedia'], 150,
+    'Jóvenes de distintos mundos se cruzan en una historia de amistad, música y primeras emociones.'),
+  t('xhdrbz', 'XHDRBZ', 2002, 'Serie', ['Comedia'], 100,
+    'Programa de sketches y parodias que mezcla humor absurdo con personajes memorables.',
+    ['Eugenio Derbez'], { seasons: 3, popular: true }),
+  t('luche', 'La familia P. Luche', 2002, 'Serie', ['Comedia'], 60,
+    'Una familia que aparenta ser rica y refinada, aunque su realidad es otra, protagoniza enredos hilarantes.',
+    ['Eugenio Derbez', 'Consuelo Duval'], { seasons: 4 }),
+  t('rosa', 'La rosa de Guadalupe', 2008, 'Serie', ['Drama'], 500,
+    'Episodios independientes sobre dilemas familiares y sociales donde la fe ofrece una salida.',
+    [], { seasons: 14, popular: true }),
+  t('clase406', 'Clase 406', 2002, 'Serie', ['Juvenil', 'Drama'], 220,
+    'Un grupo de estudiantes de la Academia de Artes Aplicadas vive amor, música y ambición.', [], { seasons: 2 }),
+  t('chavo-animado', 'El Chavo animado', 2006, 'Serie', ['Comedia', 'Juvenil'], 100,
+    'Versión animada de la vecindad más famosa, con las travesuras de sus personajes clásicos.', [], { seasons: 3 }),
+  t('gata', 'La gata', 2014, 'Telenovela', ['Drama'], 102,
+    'Una joven criada en un humilde barrio descubre un secreto que cambia su destino.'),
+  t('hermanos', 'Hermanos y detectives', 2009, 'Serie', ['Suspenso', 'Comedia'], 90,
+    'Un grupo de hermanos resuelve casos mientras lidia con sus propias rivalidades.', [], { seasons: 2 }),
+]
+
+export const years = [...new Set(titles.map((x) => x.year))].sort()
+export const genres = [...new Set(titles.flatMap((x) => x.genres))].sort()
+export const types = ['Telenovela', 'Serie']

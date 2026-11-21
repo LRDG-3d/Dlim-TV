@@ -1,19 +1,16 @@
-import { IonContent, IonPage } from '@ionic/react';
-import TopBar from '../components/TopBar';
-import PosterGrid from '../components/PosterGrid';
-import { byId } from '../services/catalogUtils';
-import { useFavorites } from '../services/favorites';
-import { useCatalog } from '../services/catalogStore';
+import { Link } from 'react-router-dom'
+import Card from '../components/Card.jsx'
+import { titles } from '../data/titles.js'
+import { useFavorites } from '../hooks/useFavorites.jsx'
 
 export default function Favorites() {
-  const { ids } = useFavorites();
-  const { items } = useCatalog();
+  const { ids } = useFavorites()
+  const list = titles.filter((x) => ids.includes(x.id))
   return (
-    <IonPage>
-      <TopBar />
-      <IonContent fullscreen>
-        <PosterGrid items={ids.map((id) => byId(items, id)).filter(Boolean)} empty="Tu lista está vacía. Añade producciones desde su ficha." />
-      </IonContent>
-    </IonPage>
-  );
+    <main className="page">
+      <h1 className="page-title">Mis favoritos</h1>
+      {list.length ? <div className="grid">{list.map((i) => <Card key={i.id} item={i} />)}</div>
+        : <p className="empty">Aún no tienes favoritos. Explora el <Link to="/catalogo">catálogo</Link> y toca “+ Mi lista”.</p>}
+    </main>
+  )
 }

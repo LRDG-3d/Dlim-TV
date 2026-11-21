@@ -1,15 +1,14 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import '@ionic/react/css/core.css';
-import '@ionic/react/css/normalize.css';
-import '@ionic/react/css/structure.css';
-import '@ionic/react/css/typography.css';
-import '@ionic/react/css/padding.css';
-import '@ionic/react/css/flex-utils.css';
-import '@ionic/react/css/display.css';
-import './theme/variables.css';
-import './styles/blim.css';
-import './styles/intro.css';
-import App from './App';
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import { HashRouter } from 'react-router-dom'
+import App from './App.jsx'
+import { FavoritesProvider } from './hooks/useFavorites.jsx'
+import './styles/global.css'
 
-createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);
+createRoot(document.getElementById('root')).render(
+  <HashRouter>
+    <FavoritesProvider>
+      <App />
+    </FavoritesProvider>
+  </HashRouter>
+)

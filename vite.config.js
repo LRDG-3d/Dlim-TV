@@ -1,3 +1,5 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-export default defineConfig({ plugins: [react()], build: { outDir: 'dist' }, server: { port: 5173 } });
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// base './' = rutas relativas: funciona en GitHub Pages con cualquier nombre de repositorio.
+export default defineConfig({ plugins: [react()], base: './' })
