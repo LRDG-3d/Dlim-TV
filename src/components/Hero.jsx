@@ -9,10 +9,11 @@ export default function Hero({ items }) {
     const id = setInterval(() => setI((x) => (x + 1) % items.length), 8000)
     return () => clearInterval(id)
   }, [items.length])
-  const it = items[i]
+  const it = items[i % items.length]
   const h = [...it.id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 0)
-  const bg = it.image
-    ? `url(${import.meta.env.BASE_URL}images/${it.image}) center/cover`
+  const src = it.cover || (it.image && `${import.meta.env.BASE_URL}images/${it.image}`)
+  const bg = src
+    ? `url("${src}") center/cover`
     : `radial-gradient(circle at 75% 30%, hsl(${h} 70% 40%), transparent 60%), linear-gradient(120deg, hsl(${(h + 40) % 360} 50% 14%), #0b0b10)`
   return (
     <section className="hero" key={it.id}>

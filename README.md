@@ -21,3 +21,6 @@ Sin imagen, se muestra una portada generada.
 ## Publicar en GitHub Pages
 - `vite.config.js` usa `base: './'` y la app usa `HashRouter`, así que funciona con cualquier nombre de repositorio.
 - En GitHub: Settings → Pages → Source: **GitHub Actions**. Cada push a `main` despliega solo.
+
+## Panel de administración (Firebase)
+Ruta: `/#/admin`. Configura `src/firebase.js` con tu proyecto de Firebase (Authentication + Firestore) y publica las reglas de seguridad del tutorial.

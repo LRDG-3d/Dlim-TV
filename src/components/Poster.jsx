@@ -10,10 +10,11 @@ function hue(id) {
 export default function Poster({ item }) {
   const [failed, setFailed] = useState(false)
   const h = hue(item.id)
-  if (item.image && !failed) {
+  const src = item.cover || (item.image && `${import.meta.env.BASE_URL}images/${item.image}`)
+  if (src && !failed) {
     return (
       <img className="poster" alt={item.title} loading="lazy"
-        src={`${import.meta.env.BASE_URL}images/${item.image}`} onError={() => setFailed(true)} />
+        src={src} onError={() => setFailed(true)} />
     )
   }
   return (

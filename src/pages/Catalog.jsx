@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Card from '../components/Card.jsx'
-import { titles, years, genres, types } from '../data/titles.js'
+import { useTitles } from '../hooks/useTitles.jsx'
+import { years, genres, types } from '../data/titles.js'
 
 const norm = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 
 export default function Catalog({ fixedType, heading, autoFocus }) {
+  const { titles } = useTitles()
   const [params, setParams] = useSearchParams()
   const q = params.get('q') || ''
   const setQ = (v) => setParams(v ? { q: v } : {}, { replace: true })
@@ -13,7 +15,7 @@ export default function Catalog({ fixedType, heading, autoFocus }) {
   const [genre, setGenre] = useState('')
   const [type, setType] = useState('')
   const input = useRef(null)
-  useEffect(() => { if (autoFocus) input.current?.focus() }, [autoFocus])
+  useEffect(() => { if (autoFocus && window.matchMedia('(hover: hover)').matches) input.current?.focus() }, [autoFocus])
 
   const activeType = fixedType || type
   const list = titles

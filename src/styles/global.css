@@ -197,3 +197,38 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .bottombar a.active{animation:pop .35s var(--ease)}
 @media(max-width:760px){.rank{font-size:84px;-webkit-text-stroke-width:2px}.rank-item{flex-basis:170px}.track:hover .card:not(:hover){filter:none}}
 @media(prefers-reduced-motion:reduce){.splash{display:none}.hero-bg{animation:none}}
+
+/* ===== Panel admin ===== */
+.admin{max-width:760px;margin:0 auto}
+.admin-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.aform,.afield-box{display:grid;gap:16px}
+.afield-box{max-width:380px}
+.aform label,.aform fieldset{display:grid;gap:6px;font-size:13px;color:var(--mute)}
+.aform input:not([type=checkbox]),.aform select,.aform textarea,.afield-box input{background:var(--bg2);border:1px solid #ffffff22;border-radius:6px;padding:11px 12px;color:var(--tx);width:100%}
+.aform input.bad{border-color:var(--ac)}
+.aform fieldset{border:1px solid #ffffff1c;border-radius:10px;padding:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.aform legend{padding:0 6px}
+.arow{display:flex;gap:12px;flex-wrap:wrap;align-items:end}.arow>label{flex:1 1 120px}
+.chip{display:inline-flex!important;grid-auto-flow:column;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1px solid #ffffff2a;cursor:pointer;color:var(--tx)!important;transition:.2s}
+.chip input{accent-color:var(--ac)}.chip.on{background:var(--ac);border-color:var(--ac)}
+.apreview{width:130px;border-radius:6px}
+.season-row{display:flex;gap:8px;width:100%}.season-row input:first-child{width:80px;flex:none}
+.aform small{flex-basis:100%;color:var(--mute)}
+.aerr{color:#ff7a95}.aok{color:#58d68d}
+.alist-title{margin:36px 0 12px;font-size:18px}
+.alist{list-style:none;padding:0;display:grid;gap:8px;padding-bottom:100px}
+.alist li{display:flex;justify-content:space-between;gap:10px;align-items:center;background:var(--bg2);padding:12px 14px;border-radius:8px;flex-wrap:wrap}
+.alist small{color:var(--mute);margin-left:6px}
+.alist .btn{padding:7px 14px;font-size:13px}
+.seasons{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+
+/* ===== Correcciones de renderizado ===== */
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+.page-anim{min-height:100vh;background:var(--bg)}
+.nav,.nav.solid,.bottombar,.toast{will-change:transform;transform-style:flat}
+.nav,.nav.solid{transform:translateZ(0)}
+@media(hover:none){
+  .nav,.nav.solid,.bottombar,.toast{-webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%)}
+  .track:hover .card:not(:hover){filter:none}
+  .hero-bg{animation:fade .9s var(--ease)}
+}

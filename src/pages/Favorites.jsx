@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
 import Card from '../components/Card.jsx'
-import { titles } from '../data/titles.js'
+import { useTitles } from '../hooks/useTitles.jsx'
 import { useFavorites } from '../hooks/useFavorites.jsx'
 
 export default function Favorites() {
+  const { titles } = useTitles()
   const { ids } = useFavorites()
   const list = titles.filter((x) => ids.includes(x.id))
   return (

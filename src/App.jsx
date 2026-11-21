@@ -5,6 +5,8 @@ import Home from './pages/Home.jsx'
 import Catalog from './pages/Catalog.jsx'
 import Detail from './pages/Detail.jsx'
 import Favorites from './pages/Favorites.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
+import Admin from './pages/Admin.jsx'
 import Settings from './pages/Settings.jsx'
 import BottomBar from './components/BottomBar.jsx'
 
@@ -23,6 +25,7 @@ export default function App() {
       {splash && <div className="splash"><span>DLIM<b>TV</b></span></div>}
       <Navbar />
       <div className="page-anim" key={pathname}>
+      <ErrorBoundary resetKey={pathname}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/series" element={<Catalog fixedType="Serie" heading="Series" />} />
@@ -30,10 +33,12 @@ export default function App() {
         <Route path="/catalogo" element={<Catalog heading="Catálogo" />} />
         <Route path="/buscar" element={<Catalog heading="Buscar" autoFocus />} />
         <Route path="/titulo/:id" element={<Detail />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="/ajustes" element={<Settings />} />
         <Route path="/favoritos" element={<Favorites />} />
         <Route path="*" element={<Home />} />
       </Routes>
+      </ErrorBoundary>
       </div>
       <BottomBar />
       <footer className="footer">Dlim TV · Proyecto de catálogo fan, sin fines de lucro. Las producciones pertenecen a sus titulares.</footer>
