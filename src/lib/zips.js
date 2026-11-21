@@ -1,5 +1,12 @@
 // Detecta los archivos .zip dentro de la carpeta (URL) de una temporada, incluyendo subcarpetas.
-const natural = (a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })
+// Orden normal de episodios: por temporada/capítulo (S01E002) y, si no hay, por nombre del archivo. La subcarpeta no influye.
+const baseName = (n) => n.split('/').pop()
+const num = (n) => { const m = baseName(n).match(/S(\d+)E(\d+)/i); return m ? [+m[1], +m[2]] : null }
+const natural = (a, b) => {
+  const x = num(a.name); const y = num(b.name)
+  if (x && y && (x[0] !== y[0] || x[1] !== y[1])) return x[0] - y[0] || x[1] - y[1]
+  return baseName(a.name).localeCompare(baseName(b.name), undefined, { numeric: true })
+}
 const enc = (n) => n.split('/').map(encodeURIComponent).join('/')
 
 export function archiveId(url) {
@@ -51,9 +58,8 @@ export async function listZips(url) {
 }
 
 export const epLabel = (name) => {
-  const parts = name.split('/'); const base = parts.pop(); const folder = parts.join(' / ')
+  const base = name.split('/').pop()
   const m = base.match(/S(\d+)E(\d+)/i)
-  const label = m ? `Episodio ${+m[2]}` : base.replace(/\.zip$/i, '')
-  return folder ? `${folder} · ${label}` : label
+  return m ? `Episodio ${+m[2]}` : base.replace(/\.zip$/i, '')
 }
 export const mb = (b) => (b ? `${(b / 1048576).toFixed(0)} MB` : '')
