@@ -14,8 +14,7 @@
     <div id="root"></div>
     <script>
     (function () {
-      try { if (localStorage.getItem('dlim:safe') !== '0') document.documentElement.classList.add('safe') }
-      catch (e) { document.documentElement.classList.add('safe') }
+      try { if (localStorage.getItem('dlim:safe') === '1') document.documentElement.classList.add('safe') } catch (e) {}
       function show(m) {
         var d = document.getElementById('dlim-err');
         if (!d) {
@@ -25,7 +24,7 @@
         }
         d.textContent = 'ERROR (toca para cerrar):\n' + m;
       }
-      window.addEventListener('error', function (e) { show((e.message || '') + ' ' + (e.filename || '') + ':' + (e.lineno || '')) });
+      window.addEventListener('error', function (e) { show((e.message || '') + '\n' + ((e.error && e.error.stack) ? e.error.stack.split('\n').slice(0, 9).join('\n') : (e.filename || '') + ':' + (e.lineno || ''))) });
       window.addEventListener('unhandledrejection', function (e) { show('Promesa: ' + ((e.reason && e.reason.message) || e.reason)) });
     })();
     </script>

@@ -26,7 +26,11 @@ function resize(file) {
 
 export default function Admin() {
   const [user, setUser] = useState(undefined)
-  useEffect(() => (auth ? onAuthStateChanged(auth, setUser) : undefined), [])
+  useEffect(() => {
+    if (!auth) return undefined
+    const off = onAuthStateChanged(auth, (u) => setUser(u))
+    return () => { if (typeof off === 'function') off() }
+  }, [])
   if (!configured) return (
     <main className="page admin"><h1 className="page-title">Panel de administración</h1>
       <p className="empty">Firebase aún no está configurado. Pega tu configuración en <code>src/firebase.js</code> (mira el tutorial).</p></main>

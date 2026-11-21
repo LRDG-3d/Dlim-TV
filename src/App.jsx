@@ -19,7 +19,7 @@ export default function App() {
     const t = setTimeout(() => setSplash(false), 1900)
     return () => clearTimeout(t)
   }, [splash])
-  useEffect(() => window.scrollTo(0, 0), [pathname])
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
   return (
     <>
       {splash && <div className="splash"><span>DLIM<b>TV</b></span></div>}
