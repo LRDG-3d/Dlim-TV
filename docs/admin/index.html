@@ -3,67 +3,113 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dlim TV · Administrador</title>
 <style>
-:root{--bg:#0a0a14;--s:#14152a;--s2:#1e2040;--t:#f2f3f7;--m:#8b90a3;--g:linear-gradient(135deg,#3b82f6,#8b5cf6)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px/1.4 system-ui,Roboto,sans-serif;padding:16px;max-width:760px;margin:auto}
-h1{font-size:20px;margin:0 0 14px}h1 span{background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
-h2{font-size:15px;margin:22px 0 8px}
-input,textarea,select{width:100%;background:var(--s);color:var(--t);border:1px solid #2c2e50;border-radius:6px;padding:10px;font:inherit;margin:4px 0 10px}
-label{color:var(--m);font-size:12px}textarea{min-height:90px}
-button{border:0;border-radius:6px;padding:11px 16px;font:600 14px inherit;color:#fff;background:var(--g);cursor:pointer}
-button.g{background:var(--s2)}button.d{background:#8a1f3a}
-.row{display:flex;gap:10px}.row>*{flex:1}.cats{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
-.cats label{display:flex;gap:6px;align-items:center;background:var(--s);padding:6px 10px;border-radius:999px;color:var(--t)}.cats input{width:auto;margin:0}
-.item{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--s);padding:10px 12px;border-radius:6px;margin-bottom:6px}
-.item b{display:block}.item small{color:var(--m)}.msg{color:var(--m);margin:8px 0}.ok{color:#5ee08a}.err{color:#ff7a8a}
-.count{font-size:18px;font-weight:700;margin:6px 0}.hide{display:none}
+:root{--bg:#0a0a14;--s:#14152a;--s2:#1e2040;--ln:#2c2e50;--t:#f2f3f7;--m:#8b90a3;--b:#3b82f6;--p:#8b5cf6;--g:linear-gradient(135deg,#3b82f6,#8b5cf6)}
+*{box-sizing:border-box}html{scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--t);font:14px/1.45 system-ui,Roboto,sans-serif;padding:0 0 90px}
+.wrap{max-width:900px;margin:auto;padding:14px}
+.top{position:sticky;top:0;z-index:20;background:rgba(10,10,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--ln)}
+.top .wrap{display:flex;align-items:center;gap:10px;padding:10px 14px}
+.logo{font-weight:800;font-size:18px}.logo span{background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}.logo em{font-style:normal;font-size:11px;margin-left:5px;padding:2px 6px;border-radius:4px;background:var(--g);color:#fff}
+.sp{flex:1}.who{color:var(--m);font-size:12px;max-width:40vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+nav{display:flex;gap:8px;padding:0 14px 10px;max-width:900px;margin:auto}
+nav button{flex:1}
+h2{font-size:15px;margin:22px 0 10px}
+label{display:block;color:var(--m);font-size:12px;margin:10px 0 4px}
+input,textarea,select{width:100%;background:var(--s);color:var(--t);border:1px solid var(--ln);border-radius:8px;padding:11px;font:inherit}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--p);border-color:transparent}
+textarea{min-height:90px;resize:vertical}
+button{border:0;border-radius:8px;padding:10px 14px;font:600 13px system-ui;color:#fff;background:var(--g);cursor:pointer}
+button.g{background:var(--s2)}button.d{background:#8a1f3a}button.sm{padding:6px 10px;font-size:12px}
+button.act{background:var(--g)}nav button:not(.act){background:var(--s2)}
+.card{background:var(--s);border:1px solid var(--ln);border-radius:12px;padding:14px;margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--s);border:1px solid var(--ln);border-radius:12px;padding:12px}.stat b{display:block;font-size:24px;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}.stat small{color:var(--m)}
+.bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12px}.bar i{display:block;height:8px;border-radius:4px;background:var(--g)}.bar span:first-child{width:90px;color:var(--m)}
+.tools{display:flex;gap:8px;margin:12px 0}.tools input{flex:2}.tools select{flex:1}
+.item{display:flex;gap:12px;align-items:center;background:var(--s);border:1px solid var(--ln);border-radius:12px;padding:10px;margin-bottom:8px}
+.thumb{flex:none;width:52px;height:78px;border-radius:6px;background:var(--s2) center/cover}
+.item .i{flex:1;min-width:0}.item b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.item small{color:var(--m)}
+.item .a{display:flex;flex-direction:column;gap:6px}
+.grid2{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:700px){.grid2{grid-template-columns:200px 1fr}}
+.poster{aspect-ratio:2/3;border-radius:10px;background:linear-gradient(160deg,#3b2a7a,#10102a) center/cover;position:relative;overflow:hidden;max-width:200px;width:100%}
+.poster span{position:absolute;left:0;right:0;bottom:0;padding:28px 10px 10px;font-weight:700;background:linear-gradient(transparent,rgba(0,0,0,.8))}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.cats{display:flex;flex-wrap:wrap;gap:8px}.cats label{display:flex;gap:6px;align-items:center;margin:0;background:var(--s2);padding:7px 12px;border-radius:999px;color:var(--t);font-size:12px}.cats input{width:auto;margin:0}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.chip{background:var(--s2);border-radius:999px}.chip.on{background:var(--g)}
+.ep{display:flex;gap:6px;align-items:center;margin-bottom:6px}.ep .n{flex:none;width:30px;text-align:center;color:var(--m);font-weight:700}.ep input{padding:8px;font-size:12px}.ep button,.ep a{flex:none;padding:7px 9px;border-radius:6px;background:var(--s2);color:#fff;text-decoration:none;font-size:12px}
+.eplist{max-height:420px;overflow:auto;margin-top:10px}
+.msg{color:var(--m);margin:8px 0;font-size:12px}.ok{color:#5ee08a}.err{color:#ff7a8a}
+.savebar{position:fixed;left:0;right:0;bottom:0;background:rgba(10,10,20,.96);border-top:1px solid var(--ln);padding:10px 14px;z-index:20}
+.savebar .in{max-width:900px;margin:auto;display:flex;gap:10px;align-items:center}.savebar .in span{flex:1;color:var(--m);font-size:12px}
+.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:var(--s2);border:1px solid var(--p);padding:10px 16px;border-radius:10px;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s}.toast.on{opacity:1}
+.hide{display:none!important}.empty{text-align:center;color:var(--m);padding:30px}
 </style></head><body>
-<h1><span>DLIM TV</span> · Administrador</h1>
-
-<div id="boot" class="msg">Cargando…</div>
+<div id="boot" class="wrap msg">Cargando…</div>
 <script>
 const B=()=>document.getElementById("boot");
-const fail=(t)=>{const b=B();if(b){b.textContent=t;b.className="msg err"}};
+const fail=(t)=>{const b=B();if(b){b.textContent=t;b.className="wrap msg err"}};
 window.addEventListener("error",(e)=>{const t=e.target;fail(t&&t.src?"No se pudo cargar "+t.src.split("/").pop()+" (¿está subido a GitHub?)":"Error: "+e.message)},true);
 window.addEventListener("unhandledrejection",(e)=>fail("Error: "+(e.reason&&e.reason.message||e.reason)));
 setTimeout(()=>{if(B()&&B().textContent==="Cargando…")fail("Firebase no respondió. Revisa firebase-config.js y los dominios autorizados.")},6000);
 </script>
 
-<section id="login" class="hide">
+<section id="login" class="wrap hide" style="max-width:420px;margin-top:40px">
+  <div class="card"><div class="logo" style="font-size:24px;margin-bottom:10px"><span>DLIM</span><em>TV</em></div>
   <label>Correo</label><input id="email" type="email" autocomplete="username">
   <label>Contraseña</label><input id="pass" type="password" autocomplete="current-password">
-  <button id="btnLogin">Entrar</button><div id="loginMsg" class="msg err"></div>
+  <p><button id="btnLogin" style="width:100%">Entrar</button></p><div id="loginMsg" class="msg err"></div></div>
 </section>
 
-<section id="noadmin" class="hide">
-  <p class="err">Esta cuenta no es administradora.</p>
-  <p class="msg">Crea en Firestore el documento <b>admins/<span id="uid"></span></b> (con cualquier campo) y recarga.</p>
-  <button class="g" id="btnOut1">Salir</button>
+<section id="noadmin" class="wrap hide">
+  <div class="card"><p class="err"><b>Esta cuenta no es administradora.</b></p>
+  <p class="msg">Crea en Firestore la colección <b>admins</b> con un documento cuyo ID sea este UID y recarga:</p>
+  <input id="uid" readonly onclick="this.select()"><p><button class="g" id="btnOut1">Salir</button></p></div>
 </section>
 
-<section id="panel" class="hide">
-  <div class="row"><button class="g" id="btnNew">Nueva producción</button><button class="g" id="btnOut2">Salir</button></div>
-  <h2 id="formTitle">Nueva producción</h2>
-  <label>Nombre</label><input id="title">
-  <div class="row"><div><label>Año</label><input id="year" type="number" min="2000" max="2014"></div>
-  <div><label>Temporada que subes</label><input id="season" type="number" min="1" value="1"></div></div>
-  <label>Categorías</label><div class="cats" id="cats"></div>
-  <label>Géneros (separados por coma)</label><input id="genres" placeholder="Drama, Romance">
-  <label>URL de la carátula (imagen)</label><input id="cover" type="url">
-  <label>Sinopsis</label><textarea id="synopsis"></textarea>
-  <label>Reparto (separado por coma)</label><input id="cast">
-  <label><input type="checkbox" id="featured" style="width:auto;margin:0 6px 0 0">Destacada en Inicio</label>
+<div id="panel" class="hide">
+  <div class="top"><div class="wrap"><div class="logo"><span>DLIM</span><em>ADMIN</em></div><div class="sp"></div><div class="who" id="who"></div><button class="g sm" id="btnOut2">Salir</button></div>
+  <nav><button id="tabList" class="act">Catálogo</button><button id="tabEdit">＋ Editor</button></nav></div>
 
-  <h2>Episodios de la temporada</h2>
-  <label>URL de la colección (página, lista .m3u/.txt o .json con los enlaces)</label>
-  <div class="row"><input id="collUrl" type="url" style="flex:3"><button id="btnFetch" style="flex:1">Detectar</button></div>
-  <label>…o pega los enlaces, uno por línea</label>
-  <textarea id="urls" placeholder="https://.../ep1.mp4&#10;https://.../ep2.mp4"></textarea>
-  <div class="count"><span id="n">0</span> episodios detectados</div>
-  <div id="fetchMsg" class="msg"></div>
-  <button id="btnSave">Guardar</button> <button class="d hide" id="btnDel">Borrar producción</button>
-  <div id="saveMsg" class="msg"></div>
+  <div id="vList" class="wrap">
+    <div class="stats" id="stats"></div>
+    <div class="card" style="margin-top:12px"><b>Por categoría</b><div id="bars"></div></div>
+    <div class="tools"><input id="q" placeholder="Buscar por nombre…"><select id="fc"></select></div>
+    <div id="list"></div>
+  </div>
 
-  <h2>Producciones publicadas</h2><div id="list"></div>
-</section>
+  <div id="vEdit" class="wrap hide">
+    <h2 id="formTitle" style="margin-top:4px">Nueva producción</h2>
+    <div class="grid2">
+      <div><div class="poster" id="pv"><span id="pvT">Título</span></div></div>
+      <div>
+        <label>Nombre</label><input id="title">
+        <div class="row"><div><label>Año</label><input id="year" type="number" inputmode="numeric" min="2000" max="2014"></div>
+        <div><label>Destacada en Inicio</label><select id="featured"><option value="0">No</option><option value="1">Sí</option></select></div></div>
+        <label>URL de la carátula (imagen)</label><input id="cover" type="url" placeholder="https://…">
+        <label>Categorías</label><div class="cats" id="cats"></div>
+        <label>Géneros (separados por coma)</label><input id="genres" placeholder="Drama, Romance">
+        <label>Reparto (separado por coma)</label><input id="cast">
+      </div>
+    </div>
+    <label>Sinopsis</label><textarea id="synopsis"></textarea>
+
+    <h2>Temporadas y episodios</h2>
+    <div class="card">
+      <div class="chips" id="seasons"></div>
+      <label>URL de la colección (página, lista .m3u/.txt o .json)</label>
+      <div class="row"><input id="collUrl" type="url" style="flex:3" placeholder="https://…"><button id="btnFetch" style="flex:1">Detectar</button></div>
+      <label>…o pega los enlaces, uno por línea <span id="found" style="color:var(--p)"></span></label>
+      <textarea id="paste" placeholder="https://…/ep1.mp4&#10;https://…/ep2.mp4"></textarea>
+      <div class="row" style="margin-top:8px"><select id="mode"><option value="add">Añadir al final</option><option value="replace">Reemplazar temporada</option></select><button id="btnApply">Aplicar a la temporada</button></div>
+      <div id="fetchMsg" class="msg"></div>
+      <div class="row" style="margin-top:6px"><button class="g sm" id="btnSort">Ordenar 1→N</button><button class="g sm" id="btnDedup">Quitar repetidos</button><button class="d sm" id="btnDelSeason">Borrar temporada</button></div>
+      <div class="eplist" id="eps"></div>
+    </div>
+    <div style="height:20px"></div>
+    <div class="savebar"><div class="in"><span id="total"></span><button class="g" id="btnCancel">Cancelar</button><button id="btnSave">Guardar</button></div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
 <script type="module" src="admin.js"></script>
 </body></html>
