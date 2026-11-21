@@ -13,6 +13,7 @@ export default function Home() {
     <IonPage>
       <TopBar />
       <IonContent fullscreen>
+        {!CATALOG.length && <div className="empty">El catálogo está vacío. Añade producciones en src/data/catalog.js.</div>}
         <Hero items={CATALOG.filter((p) => p.featured)} />
         <Carousel title="Mi lista" items={mine} />
         {CATEGORIES.map((c) => <Carousel key={c} title={c} items={inCategory(c)} />)}

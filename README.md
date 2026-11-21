@@ -3,13 +3,16 @@
 App Android de catálogo de producciones de Televisa (2000-2014) con estilo de streaming oscuro (referencia: Blim TV).
 **Ionic React + Capacitor** (Cordova no se usa). Favoritos con `@capacitor/preferences`.
 
+## Termux (Android)
+Sirve para editar código, `npm install`, `npm run dev` y `git push`. El APK lo compila GitHub Actions (pestaña Actions ▸ artefacto `app-debug`). No ejecutes `npm run assets` en Termux.
+
 ## Requisitos
 Node.js 20+, JDK 17, Android Studio (con Android SDK) y Git.
 
 ## Clonar, instalar y ejecutar
 ```bash
-git clone https://github.com/TU_USUARIO/televisa-catalogo.git
-cd televisa-catalogo
+git clone https://github.com/LRDG-3d/Dlim-TV.git
+cd Dlim-TV
 npm install
 npm run dev            # vista previa en el navegador
 ```
@@ -17,7 +20,7 @@ npm run dev            # vista previa en el navegador
 ## Crear la plataforma Android (solo la primera vez)
 ```bash
 npm run android:init   # npx cap add android + enlaza la firma de release
-npm run assets         # genera iconos y splash desde /assets
+npm run assets         # iconos y splash desde /assets (descarga @capacitor/assets al vuelo; usa sharp, no funciona en Termux: déjalo para GitHub Actions)
 npm run sync           # build web + npx cap sync android
 npm run android:open   # abre el proyecto en Android Studio
 ```
@@ -43,7 +46,7 @@ Tras el primer `npm install`, sube `package-lock.json` y cambia `npm install` po
 Todo está en `src/data/catalog.js`. Copia un bloque, cambia los campos y listo.
 - `cover`: imagen en `public/covers/` (ej. `"/covers/rebelde.jpg"`); si es `null` se genera una portada con degradado.
 - `videoUrl`: URL de vídeo **autorizado**; si existe, la ficha muestra el reproductor.
-- Los datos incluidos son de ejemplo: verifica reparto, temporadas y episodios. Usa solo imágenes y vídeos de los que tengas derechos.
+- El catálogo empieza vacío; el archivo trae una plantilla comentada. Usa solo imágenes y vídeos de los que tengas derechos.
 
 ## Estructura
 ```
