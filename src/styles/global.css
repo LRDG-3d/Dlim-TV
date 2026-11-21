@@ -293,3 +293,14 @@ html.safe .rows.flat{padding-top:20px}
 html.safe .hero{min-height:60vh}
 html.safe .welcome{min-height:60vh}
 html.safe .footer{padding-bottom:30px}
+
+/* ===== Temporadas y episodios ZIP ===== */
+.seasons{display:grid;gap:10px;margin-bottom:22px;max-width:62ch}
+.season .btn{width:100%;text-align:left}
+.eps{display:grid;gap:6px;margin-top:8px;padding:10px;background:var(--bg2);border-radius:8px;animation:rise .35s var(--ease) backwards}
+.eps p{color:var(--mute);font-size:14px}
+.ep{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;background:#ffffff0d;transition:background .2s}
+.ep:hover{background:#ffffff1c}
+.ep span{flex:1;font-weight:600;font-size:14px}.ep small{color:var(--mute)}.ep b{color:var(--ac);font-size:12px}
+.folder{font-size:13px;color:var(--mute);justify-self:start;margin-top:4px}
+.season-wrap{width:100%;display:grid;gap:4px}

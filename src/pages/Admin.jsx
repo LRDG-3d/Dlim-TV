@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import { doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db, configured } from '../firebase.js'
+import { listZips } from '../lib/zips.js'
 import { useTitles } from '../hooks/useTitles.jsx'
 import { years, genres } from '../data/titles.js'
 
@@ -59,8 +60,19 @@ function Login() {
 function Panel() {
   const { remote } = useTitles()
   const [f, setF] = useState(empty); const [msg, setMsg] = useState(''); const [err, setErr] = useState(''); const [busy, setBusy] = useState(false)
+  const [det, setDet] = useState({})
   const set = (k, v) => setF((p) => ({ ...p, [k]: v }))
   const toggleGenre = (g) => set('genres', f.genres.includes(g) ? f.genres.filter((x) => x !== g) : [...f.genres, g])
+  async function detect(i) {
+    const url = f.seasons[i]?.zip
+    if (!isUrl(url)) return
+    setDet((p) => ({ ...p, [i]: 'Buscando archivos ZIP…' }))
+    try {
+      const l = await listZips(url)
+      setF((p) => ({ ...p, episodes: p.episodes || l.length || '', seasons: p.seasons.map((x, n) => (n === i ? { ...x, count: l.length } : x)) }))
+      setDet((p) => ({ ...p, [i]: l.length ? `✓ ${l.length} archivos ZIP detectados` : 'No se detectaron ZIP en esa carpeta.' }))
+    } catch { setDet((p) => ({ ...p, [i]: 'No se pudo leer la carpeta desde el navegador; el enlace se guardará igual.' })) }
+  }
   const setSeason = (i, k, v) => set('seasons', f.seasons.map((s, n) => (n === i ? { ...s, [k]: v } : s)))
 
   async function save(e) {
@@ -75,7 +87,7 @@ function Panel() {
     const data = {
       title: f.title.trim(), type: f.type, year: y, episodes: +f.episodes || 0, genres: f.genres, synopsis: f.synopsis.trim(),
       cast: String(f.cast).split(',').map((x) => x.trim()).filter(Boolean), cover: f.cover || '', featured: f.featured, popular: f.popular,
-      seasons: f.seasons.map((s) => ({ number: +s.number, zip: s.zip.trim() })), updatedAt: serverTimestamp(),
+      seasons: f.seasons.map((s) => ({ number: +s.number, zip: s.zip.trim(), count: +s.count || 0 })), updatedAt: serverTimestamp(),
     }
     try {
       setBusy(true)
@@ -117,14 +129,16 @@ function Panel() {
         </div>
         <fieldset><legend>Temporadas</legend>
           {f.seasons.map((s, i) => (
-            <div className="season-row" key={i}>
+            <div className="season-wrap" key={i}><div className="season-row">
               <input type="number" min="1" value={s.number} onChange={(e) => setSeason(i, 'number', e.target.value)} aria-label="Número de temporada" />
-              <input type="url" placeholder="https://…/carpeta-de-la-temporada" value={s.zip} onChange={(e) => setSeason(i, 'zip', e.target.value)} className={s.zip && !isUrl(s.zip) ? 'bad' : ''} />
-              <button type="button" className="btn" onClick={() => set('seasons', f.seasons.filter((_, n) => n !== i))} aria-label="Quitar">✕</button>
+              <input type="url" placeholder="https://…/carpeta-de-la-temporada" value={s.zip} onChange={(e) => setSeason(i, 'zip', e.target.value)} className={s.zip && !isUrl(s.zip) ? 'bad' : ''} onBlur={() => detect(i)} />
+              <button type="button" className="btn" onClick={() => { set('seasons', f.seasons.filter((_, n) => n !== i)); setDet({}) }} aria-label="Quitar">✕</button>
+            </div>
+            {det[i] && <small>{det[i]}</small>}
             </div>
           ))}
           <button type="button" className="btn" onClick={() => set('seasons', [...f.seasons, { number: f.seasons.length + 1, zip: '' }])}>+ Añadir temporada</button>
-          <small>Un solo enlace por temporada: la carpeta donde están guardados los episodios en ZIP.</small>
+          <small>Un solo enlace por temporada: la carpeta donde están guardados los episodios en ZIP. La página detecta los archivos .zip sola.</small>
         </fieldset>
         {err && <p className="aerr">{err}</p>}{msg && <p className="aok">{msg}</p>}
         <div className="arow"><button className="btn primary" disabled={busy}>{busy ? 'Guardando…' : 'Guardar'}</button>
