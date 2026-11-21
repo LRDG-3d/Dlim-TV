@@ -42,7 +42,7 @@ export default function App() {
       </ErrorBoundary>
       </div>
       {!enFicha && <BottomBar />}
-      <footer className={enFicha ? 'footer slim' : 'footer'}>Dlim TV · Proyecto de catálogo fan, sin fines de lucro. Las producciones pertenecen a sus titulares.</footer>
+      {!enFicha && <div className="bar-space" aria-hidden="true" />}
     </>
   )
 }

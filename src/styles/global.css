@@ -378,3 +378,18 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;bor
 @keyframes spin{to{transform:rotate(360deg)}}
 html.safe .spinner{animation:spin .8s linear infinite!important}
 @media(prefers-reduced-motion:reduce){.spinner{animation:spin 1.6s linear infinite!important}}
+
+/* ===== Categorías más juntas y sin pie de página ===== */
+.row{margin-bottom:0}
+.row h2{margin-bottom:0;font-size:18px}
+.track{padding:8px 4% 14px;margin-bottom:0}
+.arrow{bottom:14px}
+.bar-space{height:calc(60px + env(safe-area-inset-bottom,0px))}
+.grid{padding-bottom:30px}
+.alist{padding-bottom:30px}
+.dv-seasons{padding-bottom:40px}
+/* Computadora: deja sitio para la ficha que aparece al pasar el cursor */
+@media(hover:hover) and (pointer:fine){
+  .track{padding:8px 4% 96px;margin-bottom:-76px}
+  .arrow{bottom:96px}
+}
