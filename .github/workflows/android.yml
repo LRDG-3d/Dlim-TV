@@ -28,6 +28,11 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npx cap add android
+      - name: Aplicar márgenes seguros (notch y barra de navegación en negro)
+        run: cp native/MainActivity.java android/app/src/main/java/com/lrdg/dlimtv/MainActivity.java
+      - name: Generar iconos (si hay assets/icon-only.png)
+        if: hashFiles('assets/icon-only.png') != ''
+        run: npx capacitor-assets generate --android
       - run: npx cap sync android
       - name: Compilar APK
         working-directory: android
