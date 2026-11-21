@@ -2,13 +2,15 @@ import { useMemo, useState } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import TopBar from '../components/TopBar';
 import PosterGrid from '../components/PosterGrid';
-import { CATEGORIES, GENRES, YEARS, filterCatalog } from '../services/catalogUtils';
+import { CATEGORIES, genresOf, yearsOf, filterCatalog } from '../services/catalogUtils';
+import { useCatalog } from '../services/catalogStore';
 
 export default function Catalog() {
+  const { items: all } = useCatalog();
   const [category, setCategory] = useState('');
   const [year, setYear] = useState('');
   const [genre, setGenre] = useState('');
-  const items = useMemo(() => filterCatalog({ category, year, genre }), [category, year, genre]);
+  const items = useMemo(() => filterCatalog(all, { category, year, genre }), [all, category, year, genre]);
   return (
     <IonPage>
       <TopBar />
@@ -21,11 +23,11 @@ export default function Catalog() {
         <div className="selects">
           <select aria-label="Año" value={year} onChange={(e) => setYear(e.target.value)}>
             <option value="">Todos los años</option>
-            {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+            {yearsOf(all).map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
           <select aria-label="Género" value={genre} onChange={(e) => setGenre(e.target.value)}>
             <option value="">Todos los géneros</option>
-            {GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
+            {genresOf(all).map((g) => <option key={g} value={g}>{g}</option>)}
           </select>
         </div>
         <div className="count">{items.length} producciones</div>

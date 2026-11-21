@@ -8,6 +8,7 @@ import { App as CapApp } from '@capacitor/app';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { FavoritesProvider } from './services/favorites';
+import { CatalogProvider } from './services/catalogStore';
 import Home from './pages/Home';
 import Catalog from './pages/Catalog';
 import Search from './pages/Search';
@@ -56,9 +57,11 @@ export default function App() {
   return (
     <IonApp>
       {intro && <SplashIntro onDone={done} />}
-      <FavoritesProvider>
-        <IonReactRouter><Shell /></IonReactRouter>
-      </FavoritesProvider>
+      <CatalogProvider>
+        <FavoritesProvider>
+          <IonReactRouter><Shell /></IonReactRouter>
+        </FavoritesProvider>
+      </CatalogProvider>
     </IonApp>
   );
 }

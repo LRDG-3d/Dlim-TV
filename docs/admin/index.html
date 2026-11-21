@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dlim TV · Administrador</title>
+<style>
+:root{--bg:#0a0a14;--s:#14152a;--s2:#1e2040;--t:#f2f3f7;--m:#8b90a3;--g:linear-gradient(135deg,#3b82f6,#8b5cf6)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px/1.4 system-ui,Roboto,sans-serif;padding:16px;max-width:760px;margin:auto}
+h1{font-size:20px;margin:0 0 14px}h1 span{background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:15px;margin:22px 0 8px}
+input,textarea,select{width:100%;background:var(--s);color:var(--t);border:1px solid #2c2e50;border-radius:6px;padding:10px;font:inherit;margin:4px 0 10px}
+label{color:var(--m);font-size:12px}textarea{min-height:90px}
+button{border:0;border-radius:6px;padding:11px 16px;font:600 14px inherit;color:#fff;background:var(--g);cursor:pointer}
+button.g{background:var(--s2)}button.d{background:#8a1f3a}
+.row{display:flex;gap:10px}.row>*{flex:1}.cats{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+.cats label{display:flex;gap:6px;align-items:center;background:var(--s);padding:6px 10px;border-radius:999px;color:var(--t)}.cats input{width:auto;margin:0}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--s);padding:10px 12px;border-radius:6px;margin-bottom:6px}
+.item b{display:block}.item small{color:var(--m)}.msg{color:var(--m);margin:8px 0}.ok{color:#5ee08a}.err{color:#ff7a8a}
+.count{font-size:18px;font-weight:700;margin:6px 0}.hide{display:none}
+</style></head><body>
+<h1><span>DLIM TV</span> · Administrador</h1>
+
+<section id="login" class="hide">
+  <label>Correo</label><input id="email" type="email" autocomplete="username">
+  <label>Contraseña</label><input id="pass" type="password" autocomplete="current-password">
+  <button id="btnLogin">Entrar</button><div id="loginMsg" class="msg err"></div>
+</section>
+
+<section id="noadmin" class="hide">
+  <p class="err">Esta cuenta no es administradora.</p>
+  <p class="msg">Crea en Firestore el documento <b>admins/<span id="uid"></span></b> (con cualquier campo) y recarga.</p>
+  <button class="g" id="btnOut1">Salir</button>
+</section>
+
+<section id="panel" class="hide">
+  <div class="row"><button class="g" id="btnNew">Nueva producción</button><button class="g" id="btnOut2">Salir</button></div>
+  <h2 id="formTitle">Nueva producción</h2>
+  <label>Nombre</label><input id="title">
+  <div class="row"><div><label>Año</label><input id="year" type="number" min="2000" max="2014"></div>
+  <div><label>Temporada que subes</label><input id="season" type="number" min="1" value="1"></div></div>
+  <label>Categorías</label><div class="cats" id="cats"></div>
+  <label>Géneros (separados por coma)</label><input id="genres" placeholder="Drama, Romance">
+  <label>URL de la carátula (imagen)</label><input id="cover" type="url">
+  <label>Sinopsis</label><textarea id="synopsis"></textarea>
+  <label>Reparto (separado por coma)</label><input id="cast">
+  <label><input type="checkbox" id="featured" style="width:auto;margin:0 6px 0 0">Destacada en Inicio</label>
+
+  <h2>Episodios de la temporada</h2>
+  <label>URL de la colección (página, lista .m3u/.txt o .json con los enlaces)</label>
+  <div class="row"><input id="collUrl" type="url" style="flex:3"><button id="btnFetch" style="flex:1">Detectar</button></div>
+  <label>…o pega los enlaces, uno por línea</label>
+  <textarea id="urls" placeholder="https://.../ep1.mp4&#10;https://.../ep2.mp4"></textarea>
+  <div class="count"><span id="n">0</span> episodios detectados</div>
+  <div id="fetchMsg" class="msg"></div>
+  <button id="btnSave">Guardar</button> <button class="d hide" id="btnDel">Borrar producción</button>
+  <div id="saveMsg" class="msg"></div>
+
+  <h2>Producciones publicadas</h2><div id="list"></div>
+</section>
+<script type="module" src="admin.js"></script>
+</body></html>

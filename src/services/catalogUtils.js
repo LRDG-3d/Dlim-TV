@@ -1,16 +1,14 @@
-import { CATALOG } from '../data/catalog';
-
 export const CATEGORIES = ['Telenovelas', 'Series', 'Comedias', 'Dramas', 'Juveniles', 'Suspenso'];
-export const GENRES = [...new Set(CATALOG.flatMap((p) => p.genres))].sort();
-export const YEARS = [...new Set(CATALOG.map((p) => p.year))].sort();
-export const byId = (id) => CATALOG.find((p) => p.id === id);
-export const inCategory = (c) => CATALOG.filter((p) => p.categories.includes(c));
+export const byId = (items, id) => items.find((p) => p.id === id);
+export const inCategory = (items, c) => items.filter((p) => p.categories.includes(c));
+export const genresOf = (items) => [...new Set(items.flatMap((p) => p.genres))].sort();
+export const yearsOf = (items) => [...new Set(items.map((p) => p.year))].sort();
 
 const norm = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
-export function filterCatalog({ category = '', year = '', genre = '', text = '' } = {}) {
+export function filterCatalog(items, { category = '', year = '', genre = '', text = '' } = {}) {
   const q = norm(text.trim());
-  return CATALOG.filter((p) =>
+  return items.filter((p) =>
     (!category || p.categories.includes(category)) &&
     (!year || p.year === Number(year)) &&
     (!genre || p.genres.includes(genre)) &&

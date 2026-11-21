@@ -42,7 +42,11 @@ Haz commit de la carpeta `android/` generada. Tras cada cambio en `src/`: `npm r
 Para el release firmado añade estos *secrets* del repositorio: `KEYSTORE_BASE64` (`base64 -w0 televisa-release.jks`), `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
 Tras el primer `npm install`, sube `package-lock.json` y cambia `npm install` por `npm ci` en el workflow.
 
-## Editar el catálogo
+## Firebase y administrador
+El catálogo vive en Firestore y se administra desde `docs/admin/`. Guía completa: [`docs/FIREBASE.md`](docs/FIREBASE.md).
+
+## Catálogo local (opcional)
+
 Todo está en `src/data/catalog.js`. Copia un bloque, cambia los campos y listo.
 - `cover`: imagen en `public/covers/` (ej. `"/covers/rebelde.jpg"`); si es `null` se genera una portada con degradado.
 - `videoUrl`: URL de vídeo **autorizado**; si existe, la ficha muestra el reproductor.
