@@ -1,6 +1,6 @@
-# Televisa Catálogo 2000-2014
+# Dlim TV
 
-App Android de catálogo de producciones de Televisa (2000-2014) con estilo de streaming oscuro (referencia: Blim TV).
+Dlim TV: app Android de catálogo de producciones de Televisa (2000-2014) con estilo de streaming oscuro (referencia: Blim TV).
 **Ionic React + Capacitor** (Cordova no se usa). Favoritos con `@capacitor/preferences`.
 
 ## Termux (Android)

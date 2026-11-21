@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { IonApp, IonRouterOutlet, IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, setupIonicReact, useIonRouter } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
@@ -13,6 +13,7 @@ import Catalog from './pages/Catalog';
 import Search from './pages/Search';
 import Favorites from './pages/Favorites';
 import Detail from './pages/Detail';
+import SplashIntro from './components/SplashIntro';
 
 setupIonicReact({ mode: 'md' });
 
@@ -21,7 +22,7 @@ function Shell() {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
     StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
-    StatusBar.setBackgroundColor({ color: '#0a0b10' }).catch(() => {});
+    StatusBar.setBackgroundColor({ color: '#0a0a14' }).catch(() => {});
     SplashScreen.hide().catch(() => {});
     const sub = CapApp.addListener('backButton', () => {
       if (router.canGoBack()) router.goBack(); else CapApp.exitApp();
@@ -50,8 +51,11 @@ function Shell() {
 }
 
 export default function App() {
+  const [intro, setIntro] = useState(true);
+  const done = useCallback(() => setIntro(false), []);
   return (
     <IonApp>
+      {intro && <SplashIntro onDone={done} />}
       <FavoritesProvider>
         <IonReactRouter><Shell /></IonReactRouter>
       </FavoritesProvider>

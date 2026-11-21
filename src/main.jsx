@@ -9,6 +9,7 @@ import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 import './theme/variables.css';
 import './styles/blim.css';
+import './styles/intro.css';
 import App from './App';
 
 createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);

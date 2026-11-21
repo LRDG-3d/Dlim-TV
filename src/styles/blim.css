@@ -1,21 +1,22 @@
 ion-content { --background: var(--blim-bg); }
 ion-toolbar { --border-width: 0; }
 .blim-logo { font-weight: 800; font-size: 18px; letter-spacing: .5px; padding-left: 16px; color: var(--blim-text); }
-.blim-logo span { color: var(--blim-accent); }
-.blim-tabs { border-top: 1px solid #1a1c28; }
+.blim-logo .g { background: var(--blim-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.blim-logo em { font-style: normal; font-size: 12px; margin-left: 5px; padding: 2px 7px; border-radius: 4px; background: var(--blim-grad); color: #fff; vertical-align: middle; }
+.blim-tabs { border-top: 1px solid #1c1c34; }
 .blim-tabs ion-tab-button { font-size: 11px; }
 
 /* Hero */
 .hero { position: relative; height: min(62vh, 460px); display: flex; align-items: flex-end; overflow: hidden; }
 .hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; animation: heroIn .7s ease both; }
-.hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--blim-bg) 4%, rgba(10,11,16,.35) 55%, rgba(10,11,16,.15)); }
+.hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--blim-bg) 4%, rgba(10,10,20,.35) 55%, rgba(10,10,20,.15)); }
 .hero-body { position: relative; z-index: 1; padding: 0 16px 20px; width: 100%; }
 .hero h1 { margin: 0 0 6px; font-size: clamp(26px, 7vw, 40px); font-weight: 800; line-height: 1.05; }
 .hero-meta { color: var(--blim-muted); font-size: 13px; margin-bottom: 14px; }
 .hero-actions { display: flex; gap: 10px; }
 .btn { border: 0; border-radius: 4px; padding: 11px 18px; font: 600 14px var(--ion-font-family); cursor: pointer; transition: transform .15s ease, opacity .15s; }
 .btn:active { transform: scale(.96); }
-.btn-primary { background: var(--blim-accent); color: #fff; }
+.btn-primary { background: var(--blim-grad); color: #fff; }
 .btn-ghost { background: rgba(255,255,255,.14); color: #fff; }
 @keyframes heroIn { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }
 
@@ -37,17 +38,17 @@ ion-toolbar { --border-width: 0; }
 /* Filtros */
 .chips { display: flex; gap: 8px; overflow-x: auto; padding: 8px 16px; scrollbar-width: none; }
 .chips::-webkit-scrollbar { display: none; }
-.chip { flex: none; border: 1px solid #2a2d40; background: transparent; color: var(--blim-muted); border-radius: 999px; padding: 7px 14px; font: 600 12px var(--ion-font-family); transition: all .2s; }
-.chip.on { background: var(--blim-accent); border-color: var(--blim-accent); color: #fff; }
+.chip { flex: none; border: 1px solid #2c2e50; background: transparent; color: var(--blim-muted); border-radius: 999px; padding: 7px 14px; font: 600 12px var(--ion-font-family); transition: all .2s; }
+.chip.on { background: var(--blim-grad); border-color: transparent; color: #fff; }
 .selects { display: flex; gap: 10px; padding: 0 16px; }
-.selects select { flex: 1; background: var(--blim-surface); color: var(--blim-text); border: 1px solid #2a2d40; border-radius: 6px; padding: 10px; font: 500 13px var(--ion-font-family); }
+.selects select { flex: 1; background: var(--blim-surface); color: var(--blim-text); border: 1px solid #2c2e50; border-radius: 6px; padding: 10px; font: 500 13px var(--ion-font-family); }
 .count { color: var(--blim-muted); font-size: 12px; padding: 10px 16px 0; }
 .empty { color: var(--blim-muted); text-align: center; padding: 48px 24px; font-size: 14px; }
 ion-searchbar { --background: var(--blim-surface); --color: var(--blim-text); --placeholder-color: var(--blim-muted); --icon-color: var(--blim-muted); padding: 8px 12px; }
 
 /* Ficha */
 .detail-top { position: relative; height: 300px; background-size: cover; background-position: center; }
-.detail-top::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--blim-bg), rgba(10,11,16,.2)); }
+.detail-top::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--blim-bg), rgba(10,10,20,.2)); }
 .detail-body { padding: 0 16px 32px; margin-top: -60px; position: relative; z-index: 1; animation: up .35s ease both; }
 .detail-body h1 { font-size: 28px; font-weight: 800; margin: 0 0 6px; }
 .detail-body p { line-height: 1.55; color: #c9ccd8; font-size: 14px; max-width: 60ch; }

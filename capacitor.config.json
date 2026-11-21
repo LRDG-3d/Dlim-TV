@@ -1,11 +1,11 @@
 {
   "appId": "com.catalogo.televisa2000",
-  "appName": "Televisa Catálogo 2000-2014",
+  "appName": "Dlim TV",
   "webDir": "dist",
-  "backgroundColor": "#0a0b10",
+  "backgroundColor": "#0a0a14",
   "android": { "allowMixedContent": false },
   "plugins": {
-    "SplashScreen": { "launchShowDuration": 1500, "backgroundColor": "#0a0b10", "showSpinner": false, "splashFullScreen": true, "splashImmersive": true },
+    "SplashScreen": { "launchShowDuration": 1500, "backgroundColor": "#0a0a14", "showSpinner": false, "splashFullScreen": true, "splashImmersive": true },
     "Keyboard": { "resize": "body" }
   }
 }
