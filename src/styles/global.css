@@ -232,3 +232,15 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   .track:hover .card:not(:hover){filter:none}
   .hero-bg{animation:fade .9s var(--ease)}
 }
+
+/* ===== Anti pantalla negra: sin capas animadas grandes ni capas forzadas ===== */
+.page-anim{animation:none;min-height:0;background:none}
+.hero-bg{animation:fade .9s var(--ease)}
+.nav,.nav.solid{will-change:auto;transform:none;justify-content:center;padding:12px 20px}
+.nav .logo{margin:0}
+.bottombar,.toast{will-change:auto}
+.bottombar{left:0;right:0;margin:0 auto;transform:none;animation:none}
+.bottombar a.active{animation:none}
+.toast{left:0;right:0;margin:0 auto;width:max-content;max-width:90%;transform:none}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@media(max-width:760px){.nav,.nav.solid{padding:10px 14px}}
