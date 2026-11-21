@@ -1,0 +1,2 @@
+Icono de la app (opcional): coloca aquí icon-only.png (1024x1024).
+Si existe, el workflow de Android lo usa para generar los iconos.

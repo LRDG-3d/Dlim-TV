@@ -24,3 +24,6 @@ Sin imagen, se muestra una portada generada.
 
 ## Panel de administración (Firebase)
 Ruta: `/#/admin`. Configura `src/firebase.js` con tu proyecto de Firebase (Authentication + Firestore) y publica las reglas de seguridad del tutorial.
+
+## App Android (APK en GitHub Releases)
+Actions → "Android APK" → Run workflow (ej. v1.0.0). El APK queda en la sección Releases.
