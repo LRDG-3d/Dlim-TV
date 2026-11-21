@@ -6,12 +6,18 @@ const range = (a, b) => titles.filter((x) => x.year >= a && x.year <= b)
 
 export default function Home() {
   const featured = titles.filter((x) => x.featured)
+  if (!titles.length) return (
+    <main className="welcome">
+      <h1>Bienvenido a Dlim TV</h1>
+      <p>Tu catálogo está vacío. Agrega producciones en <code>src/data/titles.js</code> y aparecerán aquí.</p>
+    </main>
+  )
   return (
     <main>
-      <Hero items={featured} />
-      <div className="rows">
+      {featured.length > 0 && <Hero items={featured} />}
+      <div className={featured.length ? "rows" : "rows flat"}>
         <Row title="Producciones destacadas" items={featured} />
-        <Row title="Lo más popular" items={titles.filter((x) => x.popular)} />
+        <Row title="Lo más popular" ranked items={titles.filter((x) => x.popular).slice(0, 10)} />
         <Row title="Telenovelas" items={titles.filter((x) => x.type === 'Telenovela')} />
         <Row title="Series" items={titles.filter((x) => x.type === 'Serie')} />
         <Row title="Del 2000 al 2004" items={range(2000, 2004)} />

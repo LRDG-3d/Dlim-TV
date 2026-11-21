@@ -15,7 +15,8 @@ export default function Hero({ items }) {
     ? `url(${import.meta.env.BASE_URL}images/${it.image}) center/cover`
     : `radial-gradient(circle at 75% 30%, hsl(${h} 70% 40%), transparent 60%), linear-gradient(120deg, hsl(${(h + 40) % 360} 50% 14%), #0b0b10)`
   return (
-    <section className="hero" style={{ background: bg }} key={it.id}>
+    <section className="hero" key={it.id}>
+      <div className="hero-bg" style={{ background: bg }} />
       <div className="hero-fade" />
       <div className="hero-body">
         <p className="hero-tag">{it.type} · {it.year}</p>

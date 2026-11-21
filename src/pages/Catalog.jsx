@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import Card from '../components/Card.jsx'
 import { titles, years, genres, types } from '../data/titles.js'
 
 const norm = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
 
 export default function Catalog({ fixedType, heading, autoFocus }) {
-  const [q, setQ] = useState('')
+  const [params, setParams] = useSearchParams()
+  const q = params.get('q') || ''
+  const setQ = (v) => setParams(v ? { q: v } : {}, { replace: true })
   const [year, setYear] = useState('')
   const [genre, setGenre] = useState('')
   const [type, setType] = useState('')
