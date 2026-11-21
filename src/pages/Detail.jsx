@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { listZips, epLabel, epNum, epCode, mb, fmtDate } from '../lib/zips.js'
 import Spinner from '../components/Spinner.jsx'
+import { useDownloads, isNative, safeName, fmtSpeed, pctOf } from '../lib/downloads.js'
 import { useTitles } from '../hooks/useTitles.jsx'
 import { useFavorites } from '../hooks/useFavorites.jsx'
 
@@ -26,9 +27,43 @@ function Cover({ it }) {
   )
 }
 
+function Episode({ e, i, dl }) {
+  const body = (
+    <>
+      <span className="dv-epn">{epNum(e.name) ?? i + 1}</span>
+      <span className="dv-ept">
+        <small>{epCode(e.name)}</small>
+        <b>{epLabel(e.name)}</b>
+        <em>{[fmtDate(e.date), mb(e.size)].filter(Boolean).join(' · ')}</em>
+      </span>
+    </>
+  )
+  if (!isNative) return <a className="dv-ep" href={e.url} target="_blank" rel="noopener noreferrer">{body}<i>›</i></a>
+  const id = safeName(e.name.split('/').pop())
+  const s = dl.map[id]
+  const st = s && s.state
+  const p = pctOf(s)
+  let ctl
+  if (st === 'done') ctl = <span className="dl-done">✓ En la app</span>
+  else if (st === 'downloading' || st === 'queued') {
+    ctl = <span className="dl-ctl"><b>{st === 'queued' ? 'En cola' : `${p}% · ${fmtSpeed(s.speed)}`}</b>
+      <button onClick={() => dl.pause(id)}>Pausar</button><button onClick={() => dl.cancel(id)}>✕</button></span>
+  } else if (st === 'paused') {
+    ctl = <span className="dl-ctl"><b>Pausado · {p}%</b>
+      <button onClick={() => dl.start(e.url, id)}>Reanudar</button><button onClick={() => dl.cancel(id)}>✕</button></span>
+  } else ctl = <button className="dl-btn" onClick={() => dl.start(e.url, id)}>{st === 'error' ? '↻ Reintentar' : '↓ Descargar'}</button>
+  return (
+    <div className="dv-ep dl-row">
+      {body}{ctl}
+      {(st === 'downloading' || st === 'paused' || st === 'queued') && <div className="dl-bar"><i style={{ width: `${p}%` }} /></div>}
+    </div>
+  )
+}
+
 function Season({ s, desc, refresh, defaultOpen }) {
   const [open, setOpen] = useState(defaultOpen)
   const [st, setSt] = useState({ loading: false, list: null, err: '' })
+  const dl = useDownloads()
   useEffect(() => {
     if (!open) return undefined
     let live = true
@@ -52,17 +87,7 @@ function Season({ s, desc, refresh, defaultOpen }) {
           {st.loading && <p className="dv-note dv-load"><Spinner small /> Buscando episodios…</p>}
           {st.err && <p className="dv-note">{st.err}</p>}
           {list && !list.length && <p className="dv-note">No se detectaron archivos ZIP en la carpeta.</p>}
-          {list && list.map((e, i) => (
-            <a key={e.url} className="dv-ep" href={e.url} target="_blank" rel="noopener noreferrer">
-              <span className="dv-epn">{epNum(e.name) ?? i + 1}</span>
-              <span className="dv-ept">
-                <small>{epCode(e.name)}</small>
-                <b>{epLabel(e.name)}</b>
-                <em>{[fmtDate(e.date), mb(e.size)].filter(Boolean).join(' · ')}</em>
-              </span>
-              <i>›</i>
-            </a>
-          ))}
+          {list && list.map((e, i) => <Episode key={e.url} e={e} i={i} dl={dl} />)}
           <a className="dv-folderlink" href={s.zip} target="_blank" rel="noopener noreferrer">Abrir carpeta ↗</a>
         </div>
       )}

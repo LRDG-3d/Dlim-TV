@@ -6,6 +6,7 @@ import Catalog from './pages/Catalog.jsx'
 import Detail from './pages/Detail.jsx'
 import Favorites from './pages/Favorites.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
+import Downloads from './pages/Downloads.jsx'
 import Admin from './pages/Admin.jsx'
 import Settings from './pages/Settings.jsx'
 import BottomBar from './components/BottomBar.jsx'
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/buscar" element={<Catalog heading="Buscar" autoFocus />} />
         <Route path="/titulo/:id" element={<Detail />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/descargas" element={<Downloads />} />
         <Route path="/ajustes" element={<Settings />} />
         <Route path="/favoritos" element={<Favorites />} />
         <Route path="*" element={<Home />} />
