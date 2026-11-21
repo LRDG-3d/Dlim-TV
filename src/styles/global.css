@@ -244,3 +244,38 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
 .toast{left:0;right:0;margin:0 auto;width:max-content;max-width:90%;transform:none}
 @keyframes toastIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @media(max-width:760px){.nav,.nav.solid{padding:10px 14px}}
+
+/* ===== Estabilidad en celular (Chrome Android) + animaciones seguras ===== */
+html{scroll-behavior:auto;background:#0b0b10}
+body::before{display:none}
+body{background:radial-gradient(70vw 50vh at 90% 0%,rgba(255,46,99,.13),transparent 70%),radial-gradient(70vw 50vh at 0% 100%,rgba(90,60,200,.13),transparent 70%),#0b0b10}
+.welcome{min-height:70vh}
+.welcome h1{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--tx);animation:none}
+.nav,.nav.solid{flex-direction:row;align-items:center;justify-content:center}
+
+/* Efecto glass: desenfoque real solo en computadora; en celular, cristal translúcido sin blur */
+@media(hover:none),(pointer:coarse){
+  .nav,.nav.solid,.bottombar,.toast,.search{-webkit-backdrop-filter:none;backdrop-filter:none;
+    background:linear-gradient(135deg,rgba(58,58,80,.82),rgba(20,20,30,.88))}
+}
+
+/* Entradas animadas en elementos pequeños (no en la página completa) */
+.track .card,.grid .card,.rank-item{animation:rise .55s var(--ease) backwards}
+.track>*:nth-child(2),.grid>*:nth-child(2){animation-delay:.06s}
+.track>*:nth-child(3),.grid>*:nth-child(3){animation-delay:.12s}
+.track>*:nth-child(4),.grid>*:nth-child(4){animation-delay:.18s}
+.track>*:nth-child(5),.grid>*:nth-child(5){animation-delay:.24s}
+.track>*:nth-child(n+6),.grid>*:nth-child(n+6){animation-delay:.3s}
+.track .rank-item .card{animation:none}
+.page-title,.filters,.setting,.empty{animation:rise .55s var(--ease) backwards}
+.filters{animation-delay:.08s}
+.welcome>*{animation:rise .7s var(--ease) backwards}
+.welcome>:nth-child(2){animation-delay:.12s}
+.bottombar a{transition:transform .15s,color .2s,background .25s}
+.bottombar a:active{transform:scale(.92)}
+.bottombar a.active svg{animation:pop .4s var(--ease)}
+.btn,.card-title{-webkit-tap-highlight-color:transparent}
+.bottombar a{-webkit-tap-highlight-color:transparent}
+@media(hover:hover) and (pointer:fine){
+  .hero-bg{animation:kenburns 14s ease-out both,fade .9s var(--ease)}
+}
