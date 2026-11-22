@@ -1,7 +1,7 @@
 // Personalización: color principal, fondo, tamaño de portadas, animaciones y efecto vidrio.
-export const ACCENTS = [['Rojo', '#ff2e63'], ['Celeste', '#38bdf8'], ['Verde', '#22c55e'], ['Morado', '#a855f7'], ['Naranja', '#fb923c'], ['Rosa', '#ec4899'], ['Dorado', '#facc15']]
+export const ACCENTS = [['Cian Dlim', '#00e8ff'], ['Morado Dlim', '#ad00ff'], ['Rojo', '#ff2e63'], ['Celeste', '#38bdf8'], ['Verde', '#22c55e'], ['Morado', '#a855f7'], ['Naranja', '#fb923c'], ['Rosa', '#ec4899'], ['Dorado', '#facc15']]
 export const BGS = [['Negro', '#000000'], ['Grafito', '#111111'], ['Azul noche', '#050b14'], ['Vino', '#0e0508'], ['Bosque', '#050f0a']]
-export const DEFAULTS = { accent: '#ff2e63', bg: '#000000', size: 1, anim: true, glass: true }
+export const DEFAULTS = { accent: '#00e8ff', bg: '#000000', size: 1, anim: true, glass: true }
 const KEY = 'dlim:theme'
 
 export function loadTheme() {
@@ -15,6 +15,8 @@ const mix = (h, a) => '#' + rgb(h).map((v) => Math.round(v + (255 - v) * a).toSt
 export function applyTheme(t) {
   const r = document.documentElement
   const s = r.style
+  const lum = (0.299 * rgb(t.accent)[0] + 0.587 * rgb(t.accent)[1] + 0.114 * rgb(t.accent)[2]) / 255
+  s.setProperty('--on-ac', lum > 0.6 ? '#001018' : '#ffffff')
   s.setProperty('--ac', t.accent); s.setProperty('--ac-rgb', rgb(t.accent).join(','))
   s.setProperty('--bg', t.bg); s.setProperty('--bg-rgb', rgb(t.bg).join(','))
   s.setProperty('--bg2', mix(t.bg, 0.08)); s.setProperty('--bg3', mix(t.bg, 0.14))

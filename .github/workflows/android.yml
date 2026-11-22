@@ -32,9 +32,9 @@ jobs:
         run: |
           cp native/*.java android/app/src/main/java/com/lrdg/dlimtv/
           python3 native/patch_manifest.py
-      - name: Generar iconos (si hay assets/icon-only.png)
+      - name: Generar icono y pantalla de inicio (assets/)
         if: hashFiles('assets/icon-only.png') != ''
-        run: npx capacitor-assets generate --android
+        run: npx capacitor-assets generate --android --iconBackgroundColor '#000000' --iconBackgroundColorDark '#000000' --splashBackgroundColor '#000000' --splashBackgroundColorDark '#000000'
       - run: npx cap sync android
       - name: Compilar APK
         working-directory: android

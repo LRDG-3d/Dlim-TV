@@ -1,2 +1,5 @@
-Icono de la app (opcional): coloca aquí icon-only.png (1024x1024).
-Si existe, el workflow de Android lo usa para generar los iconos.
+Imágenes de la app Android (las usa el proceso "Android APK"):
+- icon-only.png        icono completo 1024x1024
+- icon-foreground.png  primer plano del icono adaptable (transparente)
+- icon-background.png  fondo del icono adaptable (negro)
+- splash.png / splash-dark.png  pantalla de inicio (2732x2732)

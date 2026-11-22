@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { App as CapApp } from '@capacitor/app'
+import logo from './assets/logo.png'
 import { isNative } from './lib/downloads.js'
 import { useEffect, useState } from 'react'
 import Navbar from './components/Navbar.jsx'
@@ -37,7 +38,7 @@ export default function App() {
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
   return (
     <>
-      {splash && <div className="splash"><span>DLIM<b>TV</b></span></div>}
+      {splash && <div className="splash"><img src={logo} alt="Dlim TV" /></div>}
       <Navbar />
       <div className="page-anim" key={pathname}>
       <ErrorBoundary resetKey={pathname}>
