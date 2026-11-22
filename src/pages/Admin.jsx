@@ -3,6 +3,7 @@ import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebas
 import { doc, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, db, configured } from '../firebase.js'
 import Spinner from '../components/Spinner.jsx'
+import { parseEpisodes } from '../lib/importEpisodes.js'
 import { listZips } from '../lib/zips.js'
 import { useTitles } from '../hooks/useTitles.jsx'
 import { years, genres } from '../data/titles.js'
@@ -82,13 +83,13 @@ function Panel() {
     if (!f.title.trim()) return setErr('Escribe el nombre.')
     if (!(y >= 2000 && y <= 2014)) return setErr('El año debe estar entre 2000 y 2014.')
     if (!f.genres.length) return setErr('Elige al menos un género.')
-    const bad = f.seasons.find((s) => !isUrl(s.zip))
-    if (bad) return setErr(`La temporada ${bad.number} necesita una URL válida que empiece con http:// o https://`)
+    const bad = f.seasons.find((s) => (s.zip && !isUrl(s.zip)) || (!s.zip && !(s.episodes && s.episodes.length)))
+    if (bad) return setErr(`La temporada ${bad.number} necesita una URL válida (http o https) o un JSON de episodios.`)
     const id = f.id || `${slug(f.title)}-${y}`
     const data = {
       title: f.title.trim(), type: f.type, year: y, episodes: +f.episodes || 0, genres: f.genres, synopsis: f.synopsis.trim(),
       cast: String(f.cast).split(',').map((x) => x.trim()).filter(Boolean), cover: f.cover || '', featured: f.featured, popular: f.popular,
-      seasons: f.seasons.map((s) => ({ number: +s.number, zip: s.zip.trim(), count: +s.count || 0 })), updatedAt: serverTimestamp(),
+      seasons: f.seasons.map((s) => ({ number: +s.number, zip: (s.zip || '').trim(), count: +s.count || 0, episodes: s.episodes || [] })), updatedAt: serverTimestamp(),
     }
     try {
       setBusy(true)
@@ -101,6 +102,28 @@ function Panel() {
       else setErr(`${x.code || 'Error'}: ${x.message}`)
     }
     finally { setBusy(false) }
+  }
+  async function importJson(ev) {
+    const file = ev.target.files[0]
+    ev.target.value = ''
+    if (!file) return
+    setErr(''); setMsg('')
+    try {
+      const data = parseEpisodes(JSON.parse(await file.text()))
+      const yr = +data.firstAired.slice(0, 4)
+      setF((p) => {
+        const seasons = [...p.seasons]
+        data.seasons.forEach((eps, sn) => {
+          const i = seasons.findIndex((s) => +s.number === sn)
+          if (i >= 0) seasons[i] = { ...seasons[i], episodes: eps }
+          else seasons.push({ number: sn, zip: '', count: 0, episodes: eps })
+        })
+        seasons.sort((a, b) => a.number - b.number)
+        const nuevo = !p.id && !p.title
+        return { ...p, title: p.title || data.series, year: nuevo && yr >= 2000 && yr <= 2014 ? yr : p.year, episodes: p.episodes || data.total, seasons }
+      })
+      setMsg(`✓ ${data.total} episodios importados en ${data.seasons.size} ${data.seasons.size === 1 ? 'temporada' : 'temporadas'}. Falta guardar.`)
+    } catch (x) { setErr(x instanceof SyntaxError ? 'El archivo no es un JSON válido.' : x.message) }
   }
   const edit = (t) => { setF({ ...empty, ...t, cast: t.cast.join(', '), seasons: Array.isArray(t.seasons) ? t.seasons : [] }); window.scrollTo({ top: 0, behavior: 'smooth' }) }
   const remove = async (t) => { if (window.confirm(`¿Eliminar "${t.title}"?`)) { try { await deleteDoc(doc(db, 'titles', t.id)) } catch { setErr('No se pudo eliminar.') } } }
@@ -129,6 +152,9 @@ function Panel() {
           <label className="chip"><input type="checkbox" checked={f.popular} onChange={(e) => set('popular', e.target.checked)} />Popular</label>
         </div>
         <fieldset><legend>Temporadas</legend>
+          <label className="btn filebtn">Importar JSON de episodios
+            <input type="file" accept=".json,application/json" hidden onChange={importJson} />
+          </label>
           {f.seasons.map((s, i) => (
             <div className="season-wrap" key={i}><div className="season-row">
               <input type="number" min="1" value={s.number} onChange={(e) => setSeason(i, 'number', e.target.value)} aria-label="Número de temporada" />
@@ -136,10 +162,14 @@ function Panel() {
               <button type="button" className="btn" onClick={() => { set('seasons', f.seasons.filter((_, n) => n !== i)); setDet({}) }} aria-label="Quitar">✕</button>
             </div>
             {det[i] && <small>{det[i]}</small>}
+            {s.episodes && s.episodes.length > 0 && (
+              <small>📄 {s.episodes.length} episodios con nombre y fecha{' '}
+                <button type="button" className="linkbtn" onClick={() => setSeason(i, 'episodes', [])}>Quitar</button></small>
+            )}
             </div>
           ))}
           <button type="button" className="btn" onClick={() => set('seasons', [...f.seasons, { number: f.seasons.length + 1, zip: '' }])}>+ Añadir temporada</button>
-          <small>Un solo enlace por temporada: la carpeta donde están guardados los episodios en ZIP. La página detecta los archivos .zip sola.</small>
+          <small>Un solo enlace por temporada: la carpeta donde están guardados los episodios en ZIP. La página detecta los archivos .zip sola. El JSON de episodios es opcional.</small>
         </fieldset>
         {err && <p className="aerr">{err}</p>}{msg && <p className="aok">{msg}</p>}
         <div className="arow"><button className="btn primary" disabled={busy}>{busy ? <><Spinner small /> Guardando…</> : 'Guardar'}</button>

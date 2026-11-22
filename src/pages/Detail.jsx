@@ -27,19 +27,41 @@ function Cover({ it }) {
   )
 }
 
-function Episode({ e, i, dl }) {
+const fmtAired = (s) => { const [y, m, d] = String(s).split('-'); return y && m && d ? `${d}/${m}/${y.slice(2)}` : s }
+
+// Une los datos del JSON (por número de episodio) con los archivos ZIP detectados en la carpeta.
+function mergeRows(meta, zips) {
+  const by = new Map()
+  meta.forEach((m) => by.set(m.n, { n: m.n, m, z: null }))
+  const extra = []
+  zips.forEach((z) => {
+    const n = epNum(z.name)
+    if (n != null && by.has(n) && !by.get(n).z) by.get(n).z = z
+    else if (n != null && !by.has(n)) by.set(n, { n, m: null, z })
+    else extra.push({ n: null, m: null, z })
+  })
+  return [...[...by.values()].sort((a, b) => a.n - b.n), ...extra]
+}
+
+function Episode({ row, i, dl }) {
+  const { m, z } = row
+  const title = (m && m.title) || (z ? epLabel(z.name) : `Episodio ${row.n}`)
+  const code = ((m && m.code) || (z ? epCode(z.name) : '')) + (m && m.finale ? ' · Final de temporada' : '')
+  const info = [m && m.aired && fmtAired(m.aired), m && m.runtime ? `${m.runtime} min` : '', z && mb(z.size)].filter(Boolean).join(' · ')
   const body = (
     <>
-      <span className="dv-epn">{epNum(e.name) ?? i + 1}</span>
+      <span className="dv-epn">{row.n ?? i + 1}</span>
       <span className="dv-ept">
-        <small>{epCode(e.name)}</small>
-        <b>{epLabel(e.name)}</b>
-        <em>{[fmtDate(e.date), mb(e.size)].filter(Boolean).join(' · ')}</em>
+        <small>{code}</small>
+        <b>{title}</b>
+        {m && m.synopsis && <span className="dv-epsyn">{m.synopsis}</span>}
+        <em>{info}</em>
       </span>
     </>
   )
-  if (!isNative) return <a className="dv-ep" href={e.url} target="_blank" rel="noopener noreferrer">{body}<i>›</i></a>
-  const id = safeName(e.name.split('/').pop())
+  if (!z) return <div className="dv-ep">{body}</div>
+  if (!isNative) return <a className="dv-ep" href={z.url} target="_blank" rel="noopener noreferrer">{body}<i>›</i></a>
+  const id = safeName(z.name.split('/').pop())
   const s = dl.map[id]
   const st = s && s.state
   const p = pctOf(s)
@@ -50,8 +72,8 @@ function Episode({ e, i, dl }) {
       <button onClick={() => dl.pause(id)}>Pausar</button><button onClick={() => dl.cancel(id)}>✕</button></span>
   } else if (st === 'paused') {
     ctl = <span className="dl-ctl"><b>Pausado · {p}%</b>
-      <button onClick={() => dl.start(e.url, id)}>Reanudar</button><button onClick={() => dl.cancel(id)}>✕</button></span>
-  } else ctl = <button className="dl-btn" onClick={() => dl.start(e.url, id)}>{st === 'error' ? '↻ Reintentar' : '↓ Descargar'}</button>
+      <button onClick={() => dl.start(z.url, id)}>Reanudar</button><button onClick={() => dl.cancel(id)}>✕</button></span>
+  } else ctl = <button className="dl-btn" onClick={() => dl.start(z.url, id)}>{st === 'error' ? '↻ Reintentar' : '↓ Descargar'}</button>
   return (
     <div className="dv-ep dl-row">
       {body}{ctl}
@@ -64,8 +86,9 @@ function Season({ s, desc, refresh, defaultOpen }) {
   const [open, setOpen] = useState(defaultOpen)
   const [st, setSt] = useState({ loading: false, list: null, err: '' })
   const dl = useDownloads()
+  const meta = Array.isArray(s.episodes) ? s.episodes : []
   useEffect(() => {
-    if (!open) return undefined
+    if (!open || !s.zip) return undefined
     let live = true
     setSt((p) => ({ ...p, loading: true, err: '' }))
     listZips(s.zip)
@@ -73,8 +96,9 @@ function Season({ s, desc, refresh, defaultOpen }) {
       .catch(() => { if (live) setSt({ loading: false, list: null, err: 'No se pudo leer la carpeta desde aquí.' }) })
     return () => { live = false }
   }, [open, s.zip, refresh])
-  const list = st.list ? (desc ? [...st.list].reverse() : st.list) : null
-  const total = st.list ? st.list.length : s.count
+  let rows = mergeRows(meta, st.list || [])
+  if (desc) rows = [...rows].reverse()
+  const total = meta.length || (st.list ? st.list.length : s.count)
   return (
     <div className="dv-season">
       <button className={open ? 'dv-sh2 open' : 'dv-sh2'} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
@@ -86,9 +110,10 @@ function Season({ s, desc, refresh, defaultOpen }) {
         <div className="dv-eps">
           {st.loading && <p className="dv-note dv-load"><Spinner small /> Buscando episodios…</p>}
           {st.err && <p className="dv-note">{st.err}</p>}
-          {list && !list.length && <p className="dv-note">No se detectaron archivos ZIP en la carpeta.</p>}
-          {list && list.map((e, i) => <Episode key={e.url} e={e} i={i} dl={dl} />)}
-          <a className="dv-folderlink" href={s.zip} target="_blank" rel="noopener noreferrer">Abrir carpeta ↗</a>
+          {s.zip && st.list && !st.list.length && !meta.length && <p className="dv-note">No se detectaron archivos ZIP en la carpeta.</p>}
+          {!s.zip && !meta.length && <p className="dv-note">Esta temporada aún no tiene episodios.</p>}
+          {rows.map((row, i) => <Episode key={`${row.n}-${row.z ? row.z.url : i}`} row={row} i={i} dl={dl} />)}
+          {s.zip && <a className="dv-folderlink" href={s.zip} target="_blank" rel="noopener noreferrer">Abrir carpeta ↗</a>}
         </div>
       )}
     </div>
