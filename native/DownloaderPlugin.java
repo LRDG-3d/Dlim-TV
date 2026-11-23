@@ -3,8 +3,11 @@ package com.lrdg.dlimtv;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import java.net.URLConnection;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PermissionState;
@@ -37,11 +40,7 @@ public class DownloaderPlugin extends Plugin {
   private void go(PluginCall call) {
     String id = call.getString("id"), url = call.getString("url");
     if (id == null || url == null) { call.reject("Faltan datos"); return; }
-    id = DownloadService.clean(id);
-    getContext().getSharedPreferences("dlim_dl", Context.MODE_PRIVATE).edit().putString(id, url).apply();
-    Intent i = new Intent(getContext(), DownloadService.class).setAction(DownloadService.ACT_START)
-      .putExtra("id", id).putExtra("url", url);
-    ContextCompat.startForegroundService(getContext(), i);
+    DownloadService.enqueue(getContext(), id, url, null, null, null);
     call.resolve();
   }
 
@@ -94,5 +93,29 @@ public class DownloaderPlugin extends Plugin {
     JSObject r = new JSObject();
     r.put("items", arr);
     call.resolve(r);
+  }
+
+  @PluginMethod public void openBrowser(PluginCall call) {
+    String url = call.getString("url", "");
+    Intent i = new Intent(getContext(), BrowserActivity.class).putExtra("url", url);
+    getActivity().startActivity(i);
+    call.resolve();
+  }
+
+  @PluginMethod public void open(PluginCall call) {
+    String id = call.getString("id");
+    if (id == null) { call.reject("Falta id"); return; }
+    File f = new File(DownloadService.dir(getContext()), DownloadService.clean(id));
+    if (!f.exists()) { call.reject("El archivo no existe"); return; }
+    try {
+      Uri u = FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".fileprovider", f);
+      String mime = URLConnection.guessContentTypeFromName(f.getName());
+      if (mime == null) mime = f.getName().toLowerCase().endsWith(".zip") ? "application/zip" : "video/*";
+      Intent v = new Intent(Intent.ACTION_VIEW).setDataAndType(u, mime).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      Intent ch = Intent.createChooser(v, "Abrir con…");
+      ch.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      getActivity().startActivity(ch);
+      call.resolve();
+    } catch (Exception e) { call.reject("No hay una app para abrir este archivo"); }
   }
 }

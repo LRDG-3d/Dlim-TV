@@ -32,3 +32,7 @@ export function useDownloads() {
     remove: (id) => { Native.remove({ id }).catch(() => {}); drop(id) },
   }
 }
+
+// Navegador propio de la app (detecta videos) y apertura de archivos descargados.
+export const openBrowser = (url) => { if (Native) Native.openBrowser({ url }).catch(() => {}) }
+export const openFile = (id) => { if (Native) Native.open({ id }).catch(() => {}) }

@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.ServiceCompat;
+import androidx.core.content.ContextCompat;
 import com.getcapacitor.JSObject;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,7 +34,7 @@ public class DownloadService extends Service {
   static final int SKY = 0xFF38BDF8;
 
   static class Task {
-    String id, url = "", err = "";
+    String id, url = "", err = "", ref = "", ua = "", ck = "";
     volatile String state = "queued";
     volatile long done, total;
     volatile double speed;
@@ -59,6 +60,18 @@ public class DownloadService extends Service {
     o.put("id", t.id); o.put("url", t.url); o.put("state", t.state);
     o.put("done", t.done); o.put("total", t.total); o.put("speed", t.speed); o.put("error", t.err);
     return o;
+  }
+
+  // Guarda url y cabeceras (Referer, User-Agent, Cookie) y arranca el servicio. Con ref == null conserva las cabeceras guardadas.
+  static void enqueue(Context c, String id, String url, String ref, String ua, String ck) {
+    id = clean(id);
+    c.getSharedPreferences("dlim_dl", Context.MODE_PRIVATE).edit().putString(id, url).apply();
+    if (ref != null) {
+      c.getSharedPreferences("dlim_hdr", Context.MODE_PRIVATE).edit()
+        .putString(id, ref + "\n" + (ua == null ? "" : ua) + "\n" + (ck == null ? "" : ck)).apply();
+    }
+    Intent i = new Intent(c, DownloadService.class).setAction(ACT_START).putExtra("id", id).putExtra("url", url);
+    ContextCompat.startForegroundService(c, i);
   }
 
   static void emit(Task t) { Sink s = sink; if (s != null) s.emit(json(t)); }
@@ -94,6 +107,11 @@ public class DownloadService extends Service {
       else if ("paused".equals(t.state) || "error".equals(t.state) || "canceled".equals(t.state)) go = true;
       String url = i.getStringExtra("url");
       if (url != null && !url.isEmpty()) t.url = url;
+      String hdr = getSharedPreferences("dlim_hdr", Context.MODE_PRIVATE).getString(id, "");
+      if (!hdr.isEmpty()) {
+        String[] hp = hdr.split("\n", -1);
+        t.ref = hp[0]; t.ua = hp.length > 1 ? hp[1] : ""; t.ck = hp.length > 2 ? hp[2] : "";
+      }
       if (go) { t.state = "queued"; t.err = ""; final Task tt = t; EXEC.submit(() -> run(tt)); }
       Task cur = current();
       ServiceCompat.startForeground(this, NOTIF_ID, build(cur != null ? cur : t), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
@@ -130,7 +148,9 @@ public class DownloadService extends Service {
       long have = part.exists() ? part.length() : 0;
       c = (HttpURLConnection) new URL(t.url).openConnection();
       c.setConnectTimeout(15000); c.setReadTimeout(20000);
-      c.setRequestProperty("User-Agent", "DlimTV");
+      c.setRequestProperty("User-Agent", t.ua.isEmpty() ? "DlimTV" : t.ua);
+      if (!t.ref.isEmpty()) c.setRequestProperty("Referer", t.ref);
+      if (!t.ck.isEmpty()) c.setRequestProperty("Cookie", t.ck);
       if (have > 0) c.setRequestProperty("Range", "bytes=" + have + "-");
       int code = c.getResponseCode();
       if (code == 416) { part.delete(); t.state = "queued"; EXEC.submit(() -> run(t)); return; }

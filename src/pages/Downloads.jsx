@@ -1,4 +1,4 @@
-import { useDownloads, isNative, fmtSpeed, fmtSize, pctOf } from '../lib/downloads.js'
+import { useDownloads, isNative, fmtSpeed, fmtSize, pctOf, openFile } from '../lib/downloads.js'
 
 const label = (x) => {
   const p = pctOf(x)
@@ -29,6 +29,7 @@ export default function Downloads() {
             <div className="dl-ctl">
               {(x.state === 'downloading' || x.state === 'queued') && <button onClick={() => dl.pause(x.id)}>Pausar</button>}
               {(x.state === 'paused' || x.state === 'error') && x.url && <button onClick={() => dl.start(x.url, x.id)}>{x.state === 'error' ? 'Reintentar' : 'Reanudar'}</button>}
+              {x.state === 'done' && <button onClick={() => openFile(x.id)}>Abrir</button>}
               {x.state === 'done'
                 ? <button onClick={() => dl.remove(x.id)}>Eliminar</button>
                 : <button onClick={() => dl.cancel(x.id)}>Cancelar</button>}
